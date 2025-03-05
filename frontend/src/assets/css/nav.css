@@ -1,0 +1,556 @@
+*{
+  margin: 0px;
+  padding: 0px;
+}
+
+.nav-container{
+    display: flex;
+    justify-content: space-around;
+    padding: 0px 30px;
+    gap: 1%;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.05);
+}
+
+.brand-link{
+    text-decoration: none;
+    color: rgba(0,0,0, 1);
+    margin-top: 5px;
+}
+
+.brand{
+    flex: 1 0 10%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.brand .icon{
+    width: 50px;
+    height: 50px;
+}
+  
+.brand-text{
+    padding-left: 10px;
+    font-family: 'Rubik';
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.fold{
+    display: none;
+}
+
+.nav{
+    flex: 1 0 89%;
+    display: flex;
+    gap: 15%;
+}
+
+.goals-dropdown, .applications-dropdown, .contacts-dropdown{
+    position: fixed;
+    margin-top: 35px;
+    text-align: left;
+    background-color: rgba(250, 250, 250, 1);
+    padding: 0px 20px;
+    border-radius: 5px;
+    font-weight: 400;
+    box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+    max-height: 0px;
+    overflow: hidden;
+    z-index: 1000;
+    min-width: 350px;
+}
+
+.goals-dropdown p, .applications-dropdown p, .contacts-dropdown p{
+    padding: 20px 0px;
+    border-bottom: 1px solid rgba(10, 10, 10, 0.05);
+    cursor: pointer;
+}
+
+.goals-dropdown p:hover, .applications-dropdown p:hover, .contacts-dropdown p:hover{
+    color: rgba(50, 50, 50, 1)
+}
+
+.nav-link{
+    margin-top: 100px !important;
+    color: rgba(83, 165, 72, 1);
+    text-decoration: none;   
+}
+
+.left-nav{
+    flex: 1 0 30%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.right-nav{
+    flex: 1 0 40%;
+    display: flex;
+    
+}
+
+.right-right-nav{
+    flex: 1 0 22%;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 15%;
+}
+
+.left-right-nav{
+    flex: 1 0 72%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-right: 2px solid rgba(0, 0, 0, 0.05)
+}
+
+.search-field{
+    width: 52%;
+}
+
+.search-field input{
+    width: 80%;
+    Padding: 10px 40px;
+    padding-right: 10px;
+    border: none;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    background-image: url(../images/search.svg);
+    background-repeat: no-repeat;
+    background-position: 10px;
+}
+
+.search-field input::placeholder{
+    font-size: 14px;
+}
+
+.create_new{
+    width: 28%;
+}
+
+.create_new button{
+    width: 100%;
+    Padding: 10px 0px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: rgba(74, 147, 76, 1);
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.notification{
+    width: 30%;
+}
+
+.user{
+    width: 100%;
+}
+
+.user-dropitem{
+    display: none;
+}
+
+.note-count{
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    font-weight: 400;
+    font-size: 10px;
+    padding: 2px 3px;
+    border-radius: 20px;
+    position: relative;
+    top: -20px;
+    left: -20px;
+}
+
+.user .down-icon{
+    position: relative;
+    top: -15px;
+}
+
+.right-nav li{
+    list-style: none;
+}
+
+.left-nav li{
+    list-style: none;
+    width: 21%;
+    text-align: center;
+    padding: 3% 0%;
+    color: rgba(102, 102, 102, 0.8);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.down-icon{
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.nav-header{
+    cursor: pointer;
+}
+
+
+@media screen and (max-width: 760px) {
+    .nav-container{
+        flex-direction: column;
+        justify-content:start;
+        padding: 0px;
+        border: none;
+        gap: 0px;
+        z-index: 1000;
+        overflow: hidden;
+        max-height: 60px;
+        border-bottom: 3px solid rgba(240, 240, 240, 0.8);
+    }
+
+    .fold{
+        display: inline-block;
+        position: absolute;
+        right: 15px;
+        top: 18px;
+    }
+    
+    .brand{
+        flex: 0 0 0%;
+        align-items: center;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        padding: 15px 15px;
+        max-height: 45px !important;
+    }
+    
+    .brand .icon{
+        width: 30px;
+        height: 30px;
+    }
+      
+    .brand-text{
+        padding-left: 5px;
+        font-size: 18px;
+    }
+    
+    .nav{
+        flex: 0 0 0%;
+        flex-direction: column-reverse;
+    }
+    
+    
+    .left-nav{
+        flex: 1 0 100%;
+        display: flex;
+        flex-direction: column;
+        margin-top: 15px;
+    }
+    
+    .right-nav{
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .right-right-nav{
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row-reverse;
+        padding: 0px 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .username{
+        display: inline-block;
+        font-size: 11px;
+        font-family: Poppins;
+        color: rgba(132, 132, 132, 1)
+    }
+
+    .logout {
+        display: inline-block;
+        margin-left: 15px;
+        font-size: 10px;
+        font-weight: bolder;
+        color: rgba(50, 46, 252, 0.63)
+    }
+
+    .email{
+        font-size: 9px;
+        font-family: Poppins;
+        color: rgba(199,199,199, 1)
+    }
+
+    .left-right-nav{
+        flex: 1 0 100%;
+        justify-content: space-between;
+        padding: 15px 15px;
+        background-color: rgba(240, 240, 240, 1);
+    }
+    
+    .search-field{
+        width: 52%;
+    }
+    
+    .search-field input{
+        width: 80%;
+        Padding: 5px 40px;
+        background-color: rgba(220, 220, 220, 0.02);
+    }
+    
+    .search-field input::placeholder{
+        font-size: 12px;
+    }
+
+    .create_new{
+        width: 25%;
+    }
+    
+    .create_new button{
+        Padding: 7px 0px;
+        font-size: 11.17px;
+    }
+    
+    .notification{
+        text-align: right;
+        margin-right: -20px;
+    }
+    
+    .user{
+        width: 40%;
+    }
+
+    .user-dropitem{
+        display: inline-block;
+    }
+    
+    .note-count{
+        background-color: rgba(255, 0, 0, 0.7);
+        color: white;
+        font-weight: 400;
+        font-size: 8px;
+        padding: 2px 3px;
+        border-radius: 20px;
+        position: relative;
+        top: -20px;
+        left: -20px;
+    }
+    
+    .user .down-icon{
+        display: none;
+    }
+    
+    .right-nav li{
+        list-style: none;
+    }
+    
+    .left-nav li{
+        display: flex;
+        flex-direction: column;
+        width: 89%;
+        text-align: left;
+        padding: 15px 20px;
+        color: rgba(102, 102, 102, 0.8);
+        border-bottom: 2px solid rgba(240, 240, 240, 1);
+        font-size: 12px;
+        font-weight: 600;
+        font-family: Rubik;
+    }
+
+    .nav-text{
+        flex: 1 0 90%;
+        width: 100px;
+    }
+
+    .nav-header{
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+
+    .left-nav .down-icon{
+        text-align: left;
+        flex: 1 0 2%;
+        transform: rotate(-90deg);
+        margin-top: -10px;
+    }
+    
+    .down-icon{
+        margin-left: 5px;
+        cursor: pointer;
+    }
+    
+    .goals-dropdown, .applications-dropdown, .contacts-dropdown{
+        flex: 1 0 40%;
+        position: relative;
+        margin-top: 0px;
+        text-align: left;
+        background-color: rgba(0, 0, 0, 0);
+        padding: 0px 0px;
+        border-radius: 5px;
+        font-weight: 300;
+        box-shadow: none;
+    }
+    
+    .goals-dropdown p, .applications-dropdown p, .contacts-dropdown p{
+        padding: 10px 0px;
+        border-bottom: none;
+        cursor: pointer;
+        font-size: 9pt;
+    }
+    
+    .goals-dropdown p:hover, .applications-dropdown p:hover, .contacts-dropdown p:hover{
+        color: rgba(50, 50, 50, 1)
+    }
+    
+    .nav-link{
+        margin-top: 100px !important;
+        color: rgba(83, 165, 72, 1);
+        text-decoration: none;   
+    }
+    
+    .applications-dropdown, .contacts-dropdown{
+        display: inline-block;
+    }
+
+    /* mobile inetraction classes */
+    .turn-dropdown-icon{
+        transform: rotate(90deg);
+    }
+
+    .nav-active{
+        padding-bottom: calc(10px - 5px) !important;
+    }
+}
+
+
+/* AMINATIONA */
+
+@keyframes unfoldnav{
+    0% {
+      max-height: 45px;
+      min-height: 0vh;
+    }
+    25% {
+      max-height: 20vh;
+      min-height: 20vh;
+    }
+    50% {
+        max-height: 40vh;
+        min-height: 40vh;
+      }
+    75% {
+      max-height: 60vh;
+      min-height: 60vh;
+    }
+    99% {
+      max-height: 100vh;
+      min-height: 100vh;
+    }
+
+    100%{
+       min-height: 100vh;
+       max-height: auto;
+       overflow: auto;
+    }
+}
+
+
+@keyframes foldnav{
+    0% {
+      max-height: 100vh;
+    }
+
+    25% {
+        max-height: 80vh;
+      }
+    25% {
+        max-height: 60vh;
+    }
+    100%{
+       max-height: 60px;
+    }
+}
+
+@keyframes unfoldsubnav {
+     0% {
+        max-height: 0px;
+        margin-top: 0px;
+      }
+      25% {
+        max-height: 20vh;
+        margin-top: 5px;
+      }
+      50% {
+          max-height: 40vh;
+          margin-top: 10px;
+        }
+      75% {
+        max-height: 60vh;
+        margin-top: 15px;
+      }
+      99% {
+        max-height: 100vh;
+        margin-top: 20px;
+      }
+  
+      100%{
+         max-height: 100vh;
+         overflow: auto;
+         margin-top: 30px;
+      }
+}
+
+@keyframes foldsubnav {
+    0% {
+       max-height: auto;
+       margin-top: 30px;
+     }
+     25% {
+       max-height: 80vh;
+       margin-top: 20px;
+     }
+     50% {
+         max-height: 60vh;
+         margin-top: 10px;
+       }
+     75% {
+       max-height: 40vh;
+       margin-top: 5px;
+     }
+     99% {
+       max-height: 20vh;
+       margin-top: 0px;
+     }
+ 
+     100%{
+        max-height: 0vh;
+        margin-top: 10px;
+     }
+}
+
+
+
+
+  /* Amination classes */
+  .unfoldbar{
+    transform-origin: top;
+    animation: unfoldnav .3s ease forwards;
+  }
+
+  .foldbar{
+    animation: foldnav 0.3s ease forwards;
+  }
+
+  .unfoldsubbar{
+    animation: unfoldsubnav 0.3s ease forwards;
+  }
+
+  .foldsubbar{
+    animation: foldsubnav 0.1s ease forwards;
+  }
+
+
+  /* Interaction classes */
+  .nav-active{
+    border-bottom: 5px solid rgba(83, 165, 72, 1);
+    padding-bottom: calc(15px - 5px) !important;
+  }
+

@@ -1,0 +1,222 @@
+.container{
+  display: flex;
+  flex-wrap: wrap;
+  width: 100vw;
+  height: 100vh;
+}
+
+.form-section, .onboard-section{
+  flex: 1 0 50%;
+}
+
+.form-section{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.form{
+  width: 50%;
+}
+
+.auth-form{
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(102, 102, 102, 0.2)
+}
+
+.form header{
+  display: flex;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.form header p{
+  padding-left: 10px;
+  font-family: 'Rubik';
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.form-header{
+  margin-bottom: 20px;
+}
+
+.form-header p:nth-child(1){
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.form-header p:nth-child(2){
+  font-family: 14px;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 0.8)
+}
+
+.sign-up-link{
+  color: rgba(74, 147, 76, 1)
+}
+
+.form-element{
+  margin-bottom: 25px;
+}
+
+.form-element label{
+  font-size: 14px;
+  display: block;
+  color: rgba(102, 102, 102, 0.8);
+  margin-bottom: 5px;
+}
+
+.multi-elem{
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-sub-element{
+  width: 47%;
+}
+
+.form-sub-element input{
+  padding: 2.5% !important;
+}
+
+.form-element input{
+  width: 97.5%;
+  height: 25px;
+  border-radius: 10px;
+  border: 1px solid rgba(102, 102, 102, 0.8);
+  padding: 1.25%;
+  color: rgba(102, 102, 102, 0.8);
+}
+
+.form-element input[type="password"]{
+  background-image: url(../images/eye.png);
+  background-repeat: no-repeat;
+  background-position: calc(100% - 15px);
+}
+
+.button{
+  background-color: rgba(74, 147, 76, 1);
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+.auth-form .button{
+  width: 100%;
+  font-weight: 500;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 20px;
+}
+
+.button:hover{
+  background-color: rgba(74, 147, 76, 0.8);
+}
+
+.or{
+  position: relative;
+  top: -23px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  margin: 0px auto;
+  padding: 10px;
+  color: rgba(102, 102, 102, 0.8);
+}
+
+.google-signin{
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 50px;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.google-signin p{
+  margin-left: 10px;
+  font-size: 14px;
+  color: rgba(102, 102, 102, 0.8);
+}
+
+.error-input{
+  border: 1px solid red !important;
+  height: 100px;
+}
+
+.error-text{
+  font-size: 10px;
+  color: red;
+  padding: 5px;
+}
+
+
+
+
+@media  screen and (max-width: 760px) {
+  .container{
+    flex-direction: column;
+    width: auto;
+    height: auto;
+  }
+
+  .form{
+    width: 90%;
+    margin-top: 20px;
+  }
+  
+  .auth-form{
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(102, 102, 102, 0.2)
+  }
+  
+  .form header{
+      margin-bottom: 30px;
+      justify-content: center;
+  }
+  
+  .form header p{
+    font-size: 18px;
+    margin-left: -5px;
+  }
+
+  .form header img{
+    width: 30px;
+    height: 30px;
+  }
+  
+  .form-header{
+    margin-bottom: 20px;
+  }
+  
+  .form-header p:nth-child(1){
+    font-size: 22px;
+  }
+
+  .form-header p:nth-child(2){
+    font-size: 12px;
+  }
+  
+  .form-element{
+    margin-bottom: 15px;
+  }
+  
+  .form-element label{
+    font-size: 12px;
+    margin-bottom: 0px;
+  }
+  
+  .auth-form .button{
+    font-size: 16px;
+    padding: 8px;
+
+  }
+  
+  .google-signin p{
+    font-size: 12px;
+  }
+  
+}
