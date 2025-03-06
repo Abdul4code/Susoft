@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import ApplicationCard from "./ApplicationCard.vue";
+import ApplicationCard from "./RetrospectiveCard.vue";
 
 const props = defineProps({
     status_id: Number,

@@ -7,6 +7,7 @@ import goal from '../views/Goal.vue'
 import new_project from '../views/NewProject.vue'
 import Sprint from '../views/Sprint.vue'
 import TaskDetail from '../views/TaskDetail.vue'
+import Retrospective from '../views/Retrospective.vue'
 
 
 const router = createRouter({
@@ -27,6 +28,9 @@ const router = createRouter({
       path: '/sprint/:id', name: 'kanban', component: Sprint
     },
 
+    {
+      path: '/retrospective/:id', name: 'retrospective', component: Retrospective
+    },
     {
       path: '/detail/:id', name: 'detail', component: TaskDetail
     },

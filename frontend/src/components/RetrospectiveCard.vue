@@ -6,12 +6,16 @@ const props = defineProps({
     status_id: Number, // Current status ID
 });
 
-const emits = defineEmits(["drag_start"]);
+const emits = defineEmits(["drag_start", "update:title"]);
 
 function handleDragStart(event) {
     event.dataTransfer.setData("card_id", props.card_id);
     event.dataTransfer.setData("from_status", props.status_id);
     emits("drag_start", props.card_id);
+}
+
+function updateTitle(event) {
+    emits("update:title", event.target.value);
 }
 </script>
 
@@ -21,20 +25,12 @@ function handleDragStart(event) {
         draggable="true"
         @dragstart="handleDragStart"
     >
-        <p class="title"> Implement Security  </p>
-        <p>
-            <span class="app_icon"><img src="../assets/images/tasks.svg" /></span>
-            <span class="app_summary"> 15 Metrics </span>
-        </p>
-        <p>
-            <span class="app_icon"><img src="../assets/images/done.svg" /></span>
-            <span class="app_summary"> 9 Satisfied </span>
-        </p>
-        <div class="status-cont">
-            <div class="app-status progress"></div>
-            <div class="app-status completed"></div>
-        </div>
-        <p class="current"> Impact: Economic, Environmental</p>
+        <input 
+            class="title" 
+            type="text" 
+            :value="props.title" 
+            @input="updateTitle"
+        />
     </div>
 </template>
 
@@ -55,6 +51,8 @@ function handleDragStart(event) {
         font-weight: 400;
         width: 70%;
         margin-bottom: 25px;
+        border: none;
+        background: none;
     }
 
     .app_summary{
