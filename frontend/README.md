@@ -1,6 +1,7 @@
-# Trakit
+# Susof
 
-This template should help get you started developing with Vue 3 in Vite.
+Welcome to Susof - A webtool embedding sustainability into Agile Software Development with SusAF.
+
 
 ## Recommended IDE Setup
 
