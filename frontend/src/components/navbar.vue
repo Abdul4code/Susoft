@@ -11,8 +11,8 @@
         }
     })
 
-    const base_url = "http://localhost:5173/"
-
+    const base_url = import.meta.env.BASE_URL
+    
     function open_nav(){
         model.value.styles.navbar_open = true
         model.value.styles.fresh_load = false
@@ -100,7 +100,7 @@
             <ul class="right-nav">
                 <div class="left-right-nav">
                     <li class="search-field"> <input type="text" placeholder="Search by any keyword"/> </li>
-                    <li class="create_new"> <a :href="base_url + 'new_project'"><button> + &nbsp;  Add New </button></a></li>
+                    <li class="create_new"> <router-link to="/new_project">Add New</router-link></li>
                 </div>
                 <div class="right-right-nav">
                     <li class="notification"> <img src="../assets/images/bell.svg"> <span class="note-count">43</span> </li>
