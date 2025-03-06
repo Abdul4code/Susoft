@@ -100,7 +100,7 @@
             <ul class="right-nav">
                 <div class="left-right-nav">
                     <li class="search-field"> <input type="text" placeholder="Search by any keyword"/> </li>
-                    <li class="create_new"> <router-link to="/new_project">Add New</router-link></li>
+                    <li class="create_new"> <button> <router-link to="/new_project">Add New</router-link> </button></li>
                 </div>
                 <div class="right-right-nav">
                     <li class="notification"> <img src="../assets/images/bell.svg"> <span class="note-count">43</span> </li>
