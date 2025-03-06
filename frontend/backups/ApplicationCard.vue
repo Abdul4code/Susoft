@@ -1,40 +1,29 @@
 <script setup>
-const props = defineProps({
-    title: String,
-    tasks: Object,
-    card_id: Number, // Unique identifier for the card
-    status_id: Number, // Current status ID
-});
-
-const emits = defineEmits(["drag_start"]);
-
-function handleDragStart(event) {
-    event.dataTransfer.setData("card_id", props.card_id);
-    event.dataTransfer.setData("from_status", props.status_id);
-    emits("drag_start", props.card_id);
-}
+    let props = defineProps({
+        title : String,
+        tasks : Object,
+    })
 </script>
 
 <template>
-    <div 
-        class="app_cont" 
-        draggable="true"
-        @dragstart="handleDragStart"
-    >
-        <p class="title"> Implement Security Features  </p>
-        <p>
-            <span class="app_icon"><img src="../assets/images/tasks.svg" /></span>
-            <span class="app_summary"> 15 Metrics </span>
+    <div class="app_cont">
+        <p class="title"> University of Alabama PhD in Chemistry Application </p>
+        <p> <span class="app_icon"><img src="../assets/images/clock.svg" /> </span> 
+            <span class="app_summary"> 7 days ago </span>
+            <span class="app_summary"> 3:14:30 left </span>
         </p>
-        <p>
-            <span class="app_icon"><img src="../assets/images/done.svg" /></span>
-            <span class="app_summary"> 9 Satisfied </span>
+        <p> <span class="app_icon"><img src="../assets/images/tasks.svg" /> </span> 
+            <span class="app_summary"> 15 tasks </span>
+        </p>
+        <p> <span class="app_icon"><img src="../assets/images/done.svg" /> </span> 
+            <span class="app_summary"> 9 Done </span>
         </p>
         <div class="status-cont">
             <div class="app-status progress"></div>
             <div class="app-status completed"></div>
+            <div class="app-status canceled"></div>
         </div>
-        <p class="current"> Impact: Economic, Environmental</p>
+        <p class="current"> Current Task: Cold Mailing Proffessors</p>
     </div>
 </template>
 
@@ -46,7 +35,6 @@ function handleDragStart(event) {
         border-radius: 10px;
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
         padding: 5%;
-        cursor: grab;
     }
 
     .title{
@@ -76,7 +64,7 @@ function handleDragStart(event) {
     }
 
     .progress{
-        background-color: rgba(50, 46, 252, 0.6);
+        background-color: rgba(50, 46, 252, 1);
     }
 
     .canceled{
@@ -84,7 +72,7 @@ function handleDragStart(event) {
     }
 
     .completed{
-        background-color: rgba(0, 120, 0, 0.6);
+        background-color: green;
     }
 
     .current{

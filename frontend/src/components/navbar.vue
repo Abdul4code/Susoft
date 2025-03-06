@@ -5,11 +5,13 @@
         styles : {
             "navbar_open" : false,
             "fresh_load": true,
-            "goal_nav_open": false,
-            "application_nav_open": false,
-            "contact_nav_open": false
+            "project_nav_open": false,
+            "sprint_nav_open": false,
+            "contributors_nav_open": false
         }
     })
+
+    const base_url = "http://localhost:5173/"
 
     function open_nav(){
         model.value.styles.navbar_open = true
@@ -22,19 +24,19 @@
 
     function toggle_subnav(nav){
         if(nav == "Applications"){
-            model.value.styles.application_nav_open = !model.value.styles.application_nav_open
-            model.value.styles.goal_nav_open = false
-            model.value.styles.contact_nav_open = false
+            model.value.styles.sprint_nav_open = !model.value.styles.sprint_nav_open
+            model.value.styles.project_nav_open = false
+            model.value.styles.contributors_nav_open = false
 
         }else if(nav == "Goals"){
-            model.value.styles.goal_nav_open = !model.value.styles.goal_nav_open
-            model.value.styles.contact_nav_open = false
-            model.value.styles.application_nav_open = false
+            model.value.styles.project_nav_open = !model.value.styles.project_nav_open
+            model.value.styles.contributors_nav_open = false
+            model.value.styles.sprint_nav_open = false
 
         }else if(nav == "Contacts"){
-            model.value.styles.contact_nav_open = !model.value.styles.contact_nav_open
-            model.value.styles.goal_nav_open = false
-            model.value.styles.application_nav_open = false
+            model.value.styles.contributors_nav_open = !model.value.styles.contributors_nav_open
+            model.value.styles.project_nav_open = false
+            model.value.styles.sprint_nav_open = false
         }
     }
 
@@ -42,10 +44,12 @@
 
 <template>
     <nav class="nav-container" :class="{'unfoldbar' : model.styles.navbar_open, 'foldbar': !model.styles.navbar_open && !model.styles.fresh_load}">
-        <a href="login" class="brand-link"><div class="brand">
+        <a :href="base_url" class="brand-link">
+            <div class="brand">
                 <img src="../assets/images/icon.png" alt="" class="icon" />
-                <p class="brand-text"> Trakit </p>
-        </div></a>
+                <p class="brand-text">Susoft</p>
+            </div>
+        </a>
 
         <div v-if="model.styles.navbar_open" class="fold" @click.prevent="close_nav"> <img src="../assets/images/fold.svg" alt=""></div>
         <div v-else @click.prevent="open_nav" class="fold"> <img src="../assets/images/harmburger.svg" alt=""></div>
@@ -53,50 +57,50 @@
 
         <nav class="nav">
             <ul class="left-nav"> 
-                <li> <span class="nav-text">Dashboard</span></li>
-                <li :class="{'nav-active': model.styles.goal_nav_open}" @click.prevent="toggle_subnav('Goals')">
-                    <div class="nav-header"><span class="nav-text">Goals</span> 
-                        <span class="down-icon"> <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.goal_nav_open}"/></span>
+                <li> <span class="nav-text">Learning Hub</span></li>
+                <li :class="{'nav-active': model.styles.project_nav_open}" @click.prevent="toggle_subnav('Goals')">
+                    <div class="nav-header"><span class="nav-text">Projects</span> 
+                        <span class="down-icon"> <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.project_nav_open}"/></span>
                     </div>
-                    <div class="goals-dropdown" :class="{'foldsubbar': !model.styles.goal_nav_open, 'unfoldsubbar': model.styles.goal_nav_open}">
-                        <p> Graduate School Application </p>
-                        <p> Getting Grant for New application </p>
-                        <p> Getting investors for my new application </p>
-                        <p> Sunday School </p>
-                        <p><a href="#" class="nav-link"> More Goals </a> </p>
+                    <div class="goals-dropdown" :class="{'foldsubbar': !model.styles.project_nav_open, 'unfoldsubbar': model.styles.project_nav_open}">
+                        <p> Ecommerce Project </p>
+                        <p> University Project </p>
+                        <p> Tiktok App creation Project </p>
+                        <p> Monetization Project </p>
+                        <p><a href="#" class="nav-link"> Add Project </a> </p>
                     </div>
                 </li>
-                <li :class="{'nav-active': model.styles.application_nav_open}" @click.prevent="toggle_subnav('Applications')"> 
+                <li :class="{'nav-active': model.styles.sprint_nav_open}" @click.prevent="toggle_subnav('Applications')"> 
                     <div class="nav-header">
-                        <span class="nav-text" >Applications</span> <span class="down-icon"> 
-                            <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.application_nav_open}"/></span>
+                        <span class="nav-text" > Sprints </span> <span class="down-icon"> 
+                            <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.sprint_nav_open}"/></span>
                         </div>
-                    <div class="applications-dropdown" :class="{'foldsubbar': !model.styles.application_nav_open, 'unfoldsubbar': model.styles.application_nav_open}">
-                        <p> University of Calgary </p>
-                        <p> Google Internship </p>
-                        <p> Email Responses </p>
-                        <p> Sunday School Applications </p>
-                        <p><a href="#" class="nav-link"> More Applications </a> </p>
+                    <div class="applications-dropdown" :class="{'foldsubbar': !model.styles.sprint_nav_open, 'unfoldsubbar': model.styles.sprint_nav_open}">
+                        <p> Sprint 1 </p>
+                        <p> Sprint 2 </p>
+                        <p> Sprint 3 </p>
+                        <p> Sprint 4 </p>
+                        <p><a href="#" class="nav-link"> Add Sprint </a> </p>
                     </div>
                 </li>
-                <li :class="{'nav-active': model.styles.contact_nav_open}" @click.prevent="toggle_subnav('Contacts')"> 
+                <li :class="{'nav-active': model.styles.contributors_nav_open}" @click.prevent="toggle_subnav('Contacts')"> 
                     <div class="nav-header">
-                        <span class="nav-text">Contacts</span><span class="down-icon"> 
-                        <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.contact_nav_open}"/></span>
+                        <span class="nav-text"> Contributors </span><span class="down-icon"> 
+                        <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.contributors_nav_open}"/></span>
                     </div>
-                    <div class="contacts-dropdown" :class="{'foldsubbar': !model.styles.contact_nav_open, 'unfoldsubbar': model.styles.contact_nav_open}">
-                        <p> Sunday Olukoya </p>
-                        <p> Aina Oluwole </p>
-                        <p> Convenant Graduate School </p>
-                        <p> Work station man </p>
-                        <p><a href="#" class="nav-link"> More Contacts </a> </p>
+                    <div class="contacts-dropdown" :class="{'foldsubbar': !model.styles.contributors_nav_open, 'unfoldsubbar': model.styles.contributors_nav_open}">
+                        <p> Abdul4code </p>
+                        <p> ersirleem </p>
+                        <p> mrcrdr </p>
+                        <p> melissapuerto </p>
+                        <p><a href="#" class="nav-link"> Add contributor </a> </p>
                     </div>
                 </li>
             </ul>
             <ul class="right-nav">
                 <div class="left-right-nav">
                     <li class="search-field"> <input type="text" placeholder="Search by any keyword"/> </li>
-                    <li class="create_new"> <button> + &nbsp;  Add New </button></li>
+                    <li class="create_new"> <a :href="base_url + 'new_project'"><button> + &nbsp;  Add New </button></a></li>
                 </div>
                 <div class="right-right-nav">
                     <li class="notification"> <img src="../assets/images/bell.svg"> <span class="note-count">43</span> </li>

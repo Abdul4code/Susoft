@@ -1,0 +1,163 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    font-family: "Poppins", sans-serif;
+}
+
+.goal-header{
+    padding: 25px 40px;
+    background-color: rgba(240, 240, 240, 1);
+    margin-top: 2px;
+    display: flex;
+}
+
+.header-left{
+    flex: 1 0 40%;
+}
+
+.header-right{
+    flex: 1 0 60%;
+}
+
+.goal-title{
+    display: inline-block;
+    font-size: 28px;
+    color: rgba(53, 53, 53, 100);
+    font-family: "Poppins";
+    font-weight: 400;
+    margin-right: 20px;
+}
+
+.goal-detail-button{
+    display: inline-block;
+    border-radius: 5px;
+    background-color: rgba(102, 102, 102, 0.3);
+    font-size: 14px;
+    color: rgba(53, 53, 53, 1);
+    border: none;
+    padding: 7px 15px;
+    position: relative;
+    top: -4px;
+    font-family: 'Poppins';
+    cursor: pointer;
+}
+
+.goal-detail-button:hover{
+    background-color: rgba(52, 52, 52, 0.7);
+}
+
+.timeElement{
+    display: inline-block;
+    text-align: center;
+    margin-right: 15px;
+}
+
+.colon{
+    display: inline-block;
+    margin-right: 15px;
+    top: -17px;
+    position: relative;
+    color: rgba(83, 165, 72, 1);
+    font-size: 20px;
+}
+
+.timeElement .value{
+    font-family: 'Rubik';
+    font-size: 24px;
+    color: rgba(83, 165, 72, 1);
+    font-weight: 400;
+}
+
+.timeElement .desc{
+    font-family: 'Poppins';
+    font-size: 11px;
+    color: rgba(83, 165, 72, 1);
+    font-weight: 400;
+}
+
+.filter-pane{
+    border-top: 3px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 3px solid rgba(0, 0, 0, 0.05);
+    margin: 2px;
+    display: flex;
+    justify-content: right;
+    font-size: 14px;
+    font-family: Poppins;
+    font-weight: 400;
+    padding: 10px 0px;
+}
+
+.filter-element{
+    display: flex;
+    margin-right: 40px;
+}
+
+.filter-pane .filter-element:nth-child(1){
+    margin-right: 7%;
+}
+
+.filter-element .dropdown-values{
+    display: none;
+}
+
+.dropdown-header, .dropdown-icon{
+    display: inline-block;
+    margin-right: 5px;
+    color: rgba(76, 147, 76, 1)
+}
+
+.filter-label{
+    margin: 0px 30px;
+    color: rgba(53, 53, 53, 1)
+}
+
+.dropdown-item{
+    margin: 0px 20px;
+}
+
+.app-container{
+    min-height: 77.4vh;
+    display: flex;
+    padding: 0px 20px;
+    gap: 25px;
+    overflow-x:hidden;
+}
+
+.slider-controls{
+    position: absolute;
+    bottom: 10px;
+    text-align: center;
+    left: 0px;
+    right: 0px;
+    display: flex;
+    gap: 0%;
+    justify-content: space-around;
+}
+
+.scroll-icon{
+    width: 116px;
+    height: 116px;
+    border-radius: 70px;
+}
+
+.slider-controls .left{
+    background-image: url(../images/slider_nav_left_faded.svg);
+}
+
+.slider-controls .left:hover{
+    background-image: url(../images/slider_nav_left_light.svg);
+}
+
+.slider-controls .right{
+    background-image: url(../images/sliver_nav_right_faded.svg);
+}
+
+.slider-controls .right:hover{
+    background-image: url(../images/slider_nav_right_light.svg);
+}
+

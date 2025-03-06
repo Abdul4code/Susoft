@@ -4,6 +4,9 @@ import login from '../views/Login.vue'
 import homepage from '../views/Homepage.vue'
 import reset from '../views/reset.vue'
 import goal from '../views/Goal.vue'
+import new_project from '../views/NewProject.vue'
+import Sprint from '../views/Sprint.vue'
+import TaskDetail from '../views/TaskDetail.vue'
 
 
 const router = createRouter({
@@ -14,7 +17,18 @@ const router = createRouter({
       path: '/', name: 'homepage',component: homepage
     },
     {
+      path: '/new_project', name: 'new_project',component: new_project
+    },
+    {
       path: '/goal/:id', name: 'goal', component: goal
+    },
+
+    {
+      path: '/sprint/:id', name: 'kanban', component: Sprint
+    },
+
+    {
+      path: '/detail/:id', name: 'detail', component: TaskDetail
     },
 
     // Authentication Pages
