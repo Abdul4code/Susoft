@@ -5,7 +5,6 @@ import { ref, onMounted } from 'vue'
 import Toast from '../components/toasts.vue'
 import Navbar from '../components/navbar.vue'
 import Susaf from '../components/Susaf.vue'
-import Chat from '../components/Chat.vue'
 
 const model = ref({
     status: {
@@ -269,11 +268,6 @@ function send_metric(metric, task_id){
     <section class="container">
         <Navbar></Navbar>
         <Susaf></Susaf>
-        <Chat 
-            :open="model.status.goal_open" 
-            :fresh="model.status.fresh_page"
-            @toggle_goal_form="toggleCreateGoal">
-        </Chat>
 
         <!-- Button to open modal -->
         <button class="back-button" @click="openModal"> Generate Backlogs </button>
