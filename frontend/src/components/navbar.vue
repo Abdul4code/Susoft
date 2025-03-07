@@ -102,19 +102,9 @@ get_project();
                         <p><router-link to="/new_project" class="nav-link">Add Sprint</router-link></p>
                     </div>
                 </li>
-                <li :class="{'nav-active': model.styles.contributors_nav_open}" @click.prevent="toggle_subnav('Contacts')"> 
-                    <div class="nav-header">
-                        <span class="nav-text"> Contributors </span><span class="down-icon"> 
-                        <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.contributors_nav_open}"/></span>
-                    </div>
-                    <div class="contacts-dropdown" :class="{'foldsubbar': !model.styles.contributors_nav_open, 'unfoldsubbar': model.styles.contributors_nav_open}">
-                        <p> Abdul4code </p>
-                        <p> ersirleem </p>
-                        <p> mrcrdr </p>
-                        <p> melissapuerto </p>
-                        <p><a href="#" class="nav-link"> Add contributor </a> </p>
-                    </div>
-                </li>
+
+                <li><router-link to="/sprint/1" class="list"><span class="nav-text">Kabban</span></router-link></li>
+                
                 <li> <a class="list" :href="base_url + 'retrospective/1'"> <span class="nav-text">Retrospective</span></a></li>
             </ul>
             <ul class="right-nav">
