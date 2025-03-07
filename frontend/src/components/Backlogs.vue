@@ -46,7 +46,7 @@ watch([sprints_data, task_data], () => {
   // Methods
  function get_project(){
 
-    axios.get(`http://localhost:8000/susaf/projects/${projectId}`)
+    axios.get(`http://129.213.86.120:8000/susaf/projects/${projectId}`)
         .then(function (response) {
             project.value.title = response.data.name
             project.value.description = response.data.description
@@ -64,7 +64,7 @@ watch([sprints_data, task_data], () => {
  }
 
  function get_sprints(project_id){
-    axios.get(`http://localhost:8000/susaf/sprints/`)
+    axios.get(`http://129.213.86.120:8000/susaf/sprints/`)
         .then(function (response) {
             for (const sprint of response.data) {
                 if(sprint.project == project_id){
@@ -72,7 +72,10 @@ watch([sprints_data, task_data], () => {
                 } 
             }
             console.log(sprints_data)
-            get_tasks()
+            let resp = get_tasks()
+            if(!resp || resp.length < 1 ) {
+                setTimeout(() => {resp = get_tasks()} ,10000)
+            }
         })
         .catch(function (error) {
             console.log(error)
@@ -81,7 +84,7 @@ watch([sprints_data, task_data], () => {
  }
 
  function get_tasks() {
-    axios.get('http://localhost:8000/susaf/tasks/')
+    axios.get('http://129.213.86.120:8000/susaf/tasks/')
         .then(function (response) {
             for (const task of response.data) {
                 // Loop through each sprint in sprints_data

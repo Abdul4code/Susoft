@@ -96,9 +96,9 @@ function saveProject(result, token) {
     project_data.value.token = token
     project_data.value.description = result.data.project_description
 
-    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.baseURL = 'http://129.213.86.120:8000';
 
-    axios.post('http://localhost:8000/susaf/projects/', {
+    axios.post('http://129.213.86.120:8000/susaf/projects/', {
         name: project_data.value.name,
         token: project_data.value.token,
         description: project_data.value.description
@@ -116,7 +116,7 @@ function saveProject(result, token) {
 
             if (projectId) {
                 notifications.value.callback = () => {
-                    // router.push({ name: 'backlog', params: { id: projectId } });
+                    router.push({ name: 'backlog', params: { id: projectId } });
                 };
             }
         })
@@ -129,9 +129,9 @@ function saveProject(result, token) {
 }
 
 function generateDefaultBacklogsSprint(project_id){
-    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.baseURL = 'http://129.213.86.120:8000';
 
-    axios.post('http://localhost:8000/susaf/sprints/', {
+    axios.post('http://129.213.86.120:8000/susaf/sprints/', {
         title: "Backlogs",
         project: project_id
     })
@@ -220,9 +220,9 @@ function generateBacklogs(sprint_id, response_data){
 }
 
 function send_task(task){
-    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.baseURL = 'http://129.213.86.120:8000';
 
-        axios.post('http://localhost:8000/susaf/tasks/', {
+        axios.post('http://129.213.86.120:8000/susaf/tasks/', {
             title: task.title,
             description: task.description,
             type: task.type,
@@ -243,9 +243,9 @@ function send_task(task){
 }
 
 function send_metric(metric, task_id){
-    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.baseURL = 'http://129.213.86.120:8000';
 
-        axios.post('http://localhost:8000/susaf/metrics/', {
+        axios.post('http://129.213.86.120:8000/susaf/metrics/', {
             text: metric.text,
             status: metric.status,
             task: task_id

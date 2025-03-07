@@ -41,7 +41,7 @@ function toggle_subnav(nav) {
 }
 
 function get_project() {
-    axios.get(`http://localhost:8000/susaf/projects/`)
+    axios.get(`http://129.213.86.120:8000/susaf/projects/`)
         .then(function (response) {
             projects.value = response.data;
         })
@@ -82,7 +82,7 @@ get_project();
                     </div>
                     <div class="goals-dropdown" :class="{'foldsubbar': !model.styles.project_nav_open, 'unfoldsubbar': model.styles.project_nav_open}">
                         <p v-for="(project, index) in projects" :key="index">
-                            <router-link :to="`/backlogs/${project.id}`" class="nav-link">{{ project.name }}</router-link>
+                            <a :href="`${base_url}backlogs/${project.id}`" class="nav-link">{{ project.name }}</a>
                         </p>
                         <p><router-link to="/new_project" class="nav-link">Add Project</router-link></p>
                     </div>
@@ -102,21 +102,10 @@ get_project();
                         <p><router-link to="/new_project" class="nav-link">Add Sprint</router-link></p>
                     </div>
                 </li>
-                <li :class="{'nav-active': model.styles.contributors_nav_open}" @click.prevent="toggle_subnav('Contacts')">
-                    <div class="nav-header">
-                        <span class="nav-text">Contributors</span>
-                        <span class="down-icon">
-                            <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.contributors_nav_open}" />
-                        </span>
-                    </div>
-                    <div class="contacts-dropdown" :class="{'foldsubbar': !model.styles.contributors_nav_open, 'unfoldsubbar': model.styles.contributors_nav_open}">
-                        <p>Abdul4code</p>
-                        <p>ersirleem</p>
-                        <p>mrcrdr</p>
-                        <p>melissapuerto</p>
-                        <p><router-link to="/new_project" class="nav-link">Add Contributor</router-link></p>
-                    </div>
-                </li>
+
+                <li><router-link to="/sprint/1" class="list"><span class="nav-text">Kabban</span></router-link></li>
+                
+                <li> <a class="list" :href="base_url + 'retrospective/1'"> <span class="nav-text">Retrospective</span></a></li>
             </ul>
             <ul class="right-nav">
                 <div class="left-right-nav">

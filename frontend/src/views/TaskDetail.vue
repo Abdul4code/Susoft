@@ -1,9 +1,18 @@
 <script setup>
 import { ref, computed } from 'vue';
 import Navbar from '../components/navbar.vue';
+import router from '@/router';
+import { useRoute } from 'vue-router';
+import axios from 'axios'
+
+const route = useRoute();
+
+const taskid = route.params.id;
 
 // Define Status Options
 const STATUS_OPTIONS = ['All', 'To do', 'In progress', 'In review', 'Completed'];
+
+const taskDetail = ref("");
 
 // Define Task Status
 const taskStatus = ref({
@@ -39,13 +48,28 @@ const statusClass = (status) => {
         'completed': status === 'Completed'
     };
 };
+
+function getTask(taskId){
+    axios.get(`http://129.213.86.120:8000/susaf/tasks/${taskId}`)
+        .then(function (response) {
+            taskDetail.value = response.data
+        })
+        .catch(function (error) {
+            alert(error)
+        });
+}
+
+getTask(taskid)
 </script>
+
+
 
 <template>
     <div>
         <Navbar />
         <div class="page-container">
             <h2 class="page-title">Project Task Tracker</h2>
+            <p class="task-title"> {{ taskDetail.title }}</p>
             
             <div class="content-grid">
                 <!-- Left Column -->
@@ -72,12 +96,17 @@ const statusClass = (status) => {
                 <div class="right-column">
                     <div class="description">
                         <h3>Description</h3>
-                        <p>Track and update tasks dynamically based on progress.</p>
+                        <p> {{ taskDetail.description }} </p>
                     </div>
 
                     <div class="sustainability-impact">
-                        <h3>Sustainability Impact</h3>
-                        <p>Enhancing project management efficiency.</p>
+                        <h3> Sustainability Impact </h3>
+                        <p>{{ taskDetail.impact.join(", ")}}</p>
+                    </div>
+
+                    <div class="Imapct Type">
+                        <h3>Impact Type</h3>
+                        <p>{{ taskDetail.type}}</p>
                     </div>
                 </div>
             </div>
@@ -89,20 +118,32 @@ const statusClass = (status) => {
 .page-container {
     padding: 20px;
     font-family: 'Poppins', sans-serif;
-    max-width: 1200px;
+    max-width: 80%;
     margin: auto;
 }
 .page-title {
     text-align: center;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: bold;
     margin-bottom: 20px;
+    margin-top: 25px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.task-title{
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-top: 25px;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 50px;
 }
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 120px;
 }
+
 .left-column, .right-column {
     background: #ffffff;
     padding: 20px;
@@ -152,6 +193,10 @@ const statusClass = (status) => {
 .status-dropdown.completed {
     background-color: #28a745;
     color: white;
+}
+
+h3{
+    margin-top: 40px;
 }
 
 /* Responsive Design */
