@@ -5,7 +5,6 @@ import { ref, onMounted } from 'vue'
 import Toast from '../components/toasts.vue'
 import Navbar from '../components/navbar.vue'
 import Susaf from '../components/Susaf.vue'
-import Chatbot from '../components/Chatbot.vue'
 
 const model = ref({
     status: {
