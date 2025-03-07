@@ -41,7 +41,7 @@ function toggle_subnav(nav) {
 }
 
 function get_project() {
-    axios.get(`http://localhost:8000/susaf/projects/`)
+    axios.get(`http://129.213.86.120:8000/susaf/projects/`)
         .then(function (response) {
             projects.value = response.data;
         })
