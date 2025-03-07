@@ -50,7 +50,7 @@ const statusClass = (status) => {
 };
 
 function getTask(taskId){
-    axios.get(`http://localhost:8000/susaf/tasks/${taskId}`)
+    axios.get(`http://129.213.86.120:8000/susaf/tasks/${taskId}`)
         .then(function (response) {
             taskDetail.value = response.data
         })
