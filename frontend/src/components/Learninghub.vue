@@ -6,7 +6,23 @@ import PostCard from './PostCard.vue';
 // Sample posts with categories
 const posts = ref([
   {
+    id: 0,
+    title: "SUSAF Overview",
+    link: "https://www.youtube.com/watch?v=5iPUtG5WqFQ",
+    type: "Video",
+    description: "An overview of SUSAF.",
+    category: "Sustainability",
+  },
+  {
     id: 1,
+    title: "Advantages of using SUSAF",
+    link: "https://www.youtube.com/watch?v=tkM6aEXupko",
+    type: "Video",
+    description: "Short video about the advantages of using SUSAF.",
+    category: "Sustainability",
+  },
+  {
+    id: 2,
     title: "GreenCode Foundation",
     link: "https://www.greencode.foundation",
     type: "Link",
@@ -14,7 +30,7 @@ const posts = ref([
     category: "Sustainability",
   },
   {
-    id: 2,
+    id: 3,
     title: "Sustainability in Software Development - Video",
     link: "https://www.youtube.com/watch?v=z89NggcQpf0",
     type: "Video",
@@ -22,7 +38,7 @@ const posts = ref([
     category: "Software Engineering",
   },
   {
-    id: 3,
+    id: 4,
     title: "Learning Resource on Agile and Sustainability",
     link: "https://instituteprojectmanagement.com/blog/sustainability-in-agile-project-management/",
     type: "Link",
@@ -30,7 +46,7 @@ const posts = ref([
     category: "Sustainability",
   },
   {
-    id: 4,
+    id: 5,
     title: "AI and Climate Change Solutions",
     link: "https://www.youtube.com/watch?v=SLTqYDTJ1Go",
     type: "Link",
@@ -38,7 +54,7 @@ const posts = ref([
     category: "AI for Environment",
   },
   {
-    id: 5,
+    id: 6,
     title: "Tech for Good - Video",
     link: "https://www.youtube.com/watch?v=rLuCN5itJPo",
     type: "Video",
@@ -46,7 +62,7 @@ const posts = ref([
     category: "Technology for Good",
   },
   {
-    id: 6,
+    id: 7,
     title: "Agile for Sustainability - Webinar",
     link: "https://instituteprojectmanagement.com/blog/sustainability-in-agile-project-management/",
     type: "Link",
@@ -105,8 +121,20 @@ function changeCategory(category) {
 // FAQ Data and Filter
 const faqs = ref([
   {
-    question: 'What is the GreenCode Foundation?',
-    answer: 'The GreenCode Foundation focuses on promoting sustainability in technology by developing eco-friendly solutions.',
+    question: 'What is SusAF?',
+    answer: 'SusAF, or the Sustainability Awareness Framework, is a structured approach that helps software teams integrate sustainability considerations into their Agile development processes.'
+  },
+  {
+    question: 'Why is sustainability important in software development?',
+    answer: 'Sustainability in software development ensures that products not only perform efficiently but also reduce negative environmental, social, and economic impacts throughout their lifecycle.'
+  },
+  {
+    question: 'How does SusAF integrate into Agile processes?',
+    answer: 'SusAF is designed to fit seamlessly into Scrum by helping teams assess and address sustainability in each sprint, from planning to retrospectives, ensuring that sustainability is embedded in every decision.'
+  },
+  {
+    question: 'What are the main steps in the SusAF process?',
+    answer: 'The main steps in SusAF are: Warm-Up (introduce sustainability), Capture (identify impacts), Analyze (assess cause and effect), Synthesis (plan actions), Sustainability Update (track during development), and Reflection (review in sprint retrospectives).'
   },
   {
     question: 'How can I get started with Agile and Sustainability?',
