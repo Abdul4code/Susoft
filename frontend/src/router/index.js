@@ -8,6 +8,7 @@ import new_project from '../views/NewProject.vue'
 import Sprint from '../views/Sprint.vue'
 import TaskDetail from '../views/TaskDetail.vue'
 import Retrospective from '../views/Retrospective.vue'
+import Backlogs from '../views/Backlogs.vue'
 
 
 const router = createRouter({
@@ -21,7 +22,7 @@ const router = createRouter({
       path: '/new_project', name: 'new_project',component: new_project
     },
     {
-      path: '/goal/:id', name: 'goal', component: goal
+      path: '/backlogs/:id', name: 'backlog', component: Backlogs
     },
 
     {

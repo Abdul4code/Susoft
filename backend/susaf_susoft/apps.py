@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class GoalsConfig(AppConfig):
+class SusafSusoftConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'goals'
+    name = 'susaf_susoft'

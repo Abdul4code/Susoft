@@ -37,7 +37,7 @@ onMounted(() => {
     <section>
         <section class="goal-header">
             <div class="header-left">
-                <div class="goal-title"> Retro </div>
+                <div class="goal-title"> Retrospective </div>
             </div>
         </section>
 

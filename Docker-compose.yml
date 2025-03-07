@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Backend service (Django)
+  backend:
+    build:
+      context: ./backend  # Path to the backend directory
+      dockerfile: Dockerfile  # Dockerfile for the backend
+    container_name: django_backend
+    ports:
+      - "8000:8000"  # Expose port 8000 for Django (default port)
+    environment:
+      - DB_HOST=db
+      - DB_NAME=susaf_db
+      - DB_USER=susoft
+      - DB_PASSWORD=susoft
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app  # Mount the backend directory to the container
+    networks:
+      - susaf_network
+
+  # Frontend service (Vue.js)
+  frontend:
+    build:
+      context: ./frontend  # Path to the frontend directory
+      dockerfile: Dockerfile  # Dockerfile for the frontend
+    container_name: vue_frontend
+    ports:
+      - "8080:80"  # Expose port 8080 for Vue.js (default port)
+    networks:
+      - susaf_network
+
+  # PostgreSQL Database service
+  db:
+    image: postgres:13  # Use PostgreSQL image
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: susoft  # Set the database user
+      POSTGRES_PASSWORD: susoft  # Set the database password
+      POSTGRES_DB: susaf_db  # Set the database name
+    ports:
+      - "5432:5432"  # Exposing the PostgreSQL port to your host
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Persist data across container restarts
+    networks:
+      - susaf_network
+
+# Volumes for persistent data
+volumes:
+  db_data:
+
+# Networks
+networks:
+  susaf_network:
+    driver: bridge
