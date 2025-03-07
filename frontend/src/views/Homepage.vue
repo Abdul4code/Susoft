@@ -6,6 +6,7 @@
     import Navbar from '../components/navbar.vue'
     import EmptyGoal from '../components/emptyGoal.vue'
     import GoalForm from '../components/GoalForm.vue'
+    import Chatbot from '../components/Chatbot.vue'
 
     const model = ref({
         status : {
