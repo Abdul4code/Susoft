@@ -178,7 +178,7 @@ export default {
 }
 
 .is-dark {
-  background: #2d483b;
+  background: #2d3748;
   color: white;
 }
 
