@@ -1,128 +1,81 @@
 <script setup>
 import { ref, computed } from 'vue';
 import Navbar from '../components/navbar.vue';
-import { useRoute } from 'vue-router';
-import axios from 'axios'
 
-const route = useRoute();
+// Define Status Options
+const STATUS_OPTIONS = ['All', 'To do', 'In progress', 'In review', 'Completed'];
 
-const taskId = route.params.id;
-
+// Define Task Status
 const taskStatus = ref({
-    title: "",
-    description: "",
-    type: "",
-    imapct: "",
-    mainStatus: 'In progress',
+    mainStatus: 'All',
     metrics: [
-    ],
-    statusOptions: ['In progress', 'Done', 'Progress', 'Canceled']
+        { name: 'Has at least one sustainability practice/criteria', status: 'To do' },
+        { name: 'Must include a sustainability impact summary', status: 'To do' },
+        { name: 'The software must aim to reduce CO₂ emissions over time', status: 'In progress' },
+        { name: 'Is it using a green cloud region?', status: 'In progress' },
+        { name: 'Does it reduce repetitive database hits?', status: 'In review' },
+        { name: 'Gather program requirements', status: 'In review' },
+        { name: 'The task implementation does not introduce redundant or inefficient processing', status: 'Completed' },
+        { name: 'Task Rework Rate', status: 'Completed' }
+    ]
 });
 
-// Dynamic status color classes
-const statusColors = {
-    'In progress': 'status-in-progress',
-    'Done': 'status-done',
-    'Progress': 'status-progress',
-    'Canceled': 'status-canceled'
+// Computed property to filter tasks based on main status
+const filteredMetrics = computed(() => {
+    if (taskStatus.value.mainStatus === 'All') {
+        return taskStatus.value.metrics;
+    }
+    return taskStatus.value.metrics.filter(task => task.status === taskStatus.value.mainStatus);
+});
+
+// Function to dynamically assign class for styling based on status
+const statusClass = (status) => {
+    return {
+        'to-do': status === 'To do',
+        'in-progress': status === 'In progress',
+        'in-review': status === 'In review',
+        'completed': status === 'Completed'
+    };
 };
-
-const mainStatusClass = computed(() => statusColors[taskStatus.value.mainStatus] || 'status-default');
-
-function get_task(){
-    axios.get(`http://localhost:8000/susaf/tasks/${taskId}`)
-        .then(function (response) {
-            taskStatus.value.title = response.data.title
-            taskStatus.value.description = response.data.description
-            taskStatus.value.type = response.data.type
-            taskStatus.value.impact = response.data.impact
-
-            console.log(taskStatus)
-
-            
-        })
-        .catch(function (error) {
-            console.log(error)
-            alert(error)
-        });
-}
-
-function get_metrics(){
-    axios.get(`http://localhost:8000/susaf/metrics/${taskId}`)
-        .then(function (response) {
-            for (const metric of response.data) {
-                if(metric.task == taskId){
-                    let metric = {
-                            "name":  metric.text,
-                            "status": metric.status
-                        }
-
-                    taskStatus.value.metrics.push(metric)
-                } 
-            }
-
-            console.log(taskStatus)
-            
-            
-        })
-        .catch(function (error) {
-            console.log(error)
-            alert(error)
-        });
-}
-
-get_task()
 </script>
 
 <template>
-    <div class="app-container">
+    <div>
         <Navbar />
         <div class="page-container">
-            <!-- Page Title -->
-            <h1 class="section-heading">Task Detail</h1>
-            <h2 class="page-title">{{taskStatus.title}}</h2>
-
+            <h2 class="page-title">Project Task Tracker</h2>
+            
             <div class="content-grid">
                 <!-- Left Column -->
                 <div class="left-column">
-                    <h3 class="section-title">Sustainability Metrics</h3>
-                    <div class="status-container">
-                        <span class="status-box" :class="mainStatusClass">{{ taskStatus.mainStatus }}</span>
-                        <select v-model="taskStatus.mainStatus" class="status-dropdown">
-                            <option v-for="status in taskStatus.statusOptions" :key="status" :value="status">
-                                {{ status }}
-                            </option>
+                    <div class="status-section">
+                        <h3>Task Metrics</h3>
+                        <label for="main-status">Filter by Status:</label>
+                        <select v-model="taskStatus.mainStatus" id="main-status" class="status-dropdown">
+                            <option v-for="status in STATUS_OPTIONS" :key="status" :value="status">{{ status }}</option>
                         </select>
-                    </div>
 
-                    <div class="tasks">
-                        <div v-for="(task, index) in taskStatus.metrics" :key="index" class="task-item">
-                            <span>{{ task.name }}</span>
-                            <select v-model="task.status" class="task-dropdown">
-                                <option v-for="status in taskStatus.statusOptions" :key="status" :value="status">
-                                    {{ status }}
-                                </option>
-                            </select>
+                        <div class="tasks">
+                            <div v-for="(task, index) in filteredMetrics" :key="index" class="task-item">
+                                <span>{{ task.name }}</span>
+                                <select v-model="task.status" class="status-dropdown" :class="statusClass(task.status)">
+                                    <option v-for="status in STATUS_OPTIONS.slice(1)" :key="status" :value="status">{{ status }}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Right Column -->
                 <div class="right-column">
-                    <div class="section">
-                        <h3 class="section-title">Description</h3>
-                        <p>{{taskStatus.description}}</p>
+                    <div class="description">
+                        <h3>Description</h3>
+                        <p>Track and update tasks dynamically based on progress.</p>
                     </div>
 
-                    <div class="section">
-                        <h3 class="section-title">Sustainability Impact</h3>
-                        <p><strong>{{ taskStatus.impact.join(", ") }}</strong></p>
-
-                    </div>
-
-                    <div class="section">
-                        <h3 class="section-title">Impact Type</h3>
-                        <p><strong>{{taskStatus.type}}</strong></p>
+                    <div class="sustainability-impact">
+                        <h3>Sustainability Impact</h3>
+                        <p>Enhancing project management efficiency.</p>
                     </div>
                 </div>
             </div>
@@ -131,165 +84,78 @@ get_task()
 </template>
 
 <style scoped>
-/* General Page Styling */
-.app-container {
-    background: linear-gradient(to right, #eef2f3, #ffffff);
-    min-height: 100vh;
+.page-container {
     padding: 20px;
     font-family: 'Poppins', sans-serif;
-}
-
-.page-container {
     max-width: 1200px;
     margin: auto;
-    padding: 20px;
 }
-
-/* Page & Section Titles */
-.section-heading {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 800;
-    color: #333;
-    margin-bottom: 10px;
-    margin-top: 40px;
-}
-
 .page-title {
     text-align: center;
-    font-size: 26px;
-    font-weight: 700;
-    color: #555;
-    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
-
-/* Content Layout */
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 100px;
-    margin-top: 100px;
+    gap: 20px;
 }
-
-/* Increased Card Width */
 .left-column, .right-column {
     background: #ffffff;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-    width: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-.left-column:hover, .right-column:hover {
-    transform: translateY(-5px);
-}
-
-/* Section Titles */
-.section-title {
-    font-size: 22px;
+.status-section h3,
+.description h3,
+.sustainability-impact h3 {
+    margin-bottom: 10px;
     font-weight: 600;
-    margin-bottom: 15px;
-    color: #4A4A4A;
 }
-
-/* Status Box & Dropdown */
-.status-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.status-box {
-    padding: 8px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    text-align: center;
-    min-width: 120px;
-}
-
-/* Dynamic Status Colors */
-.status-in-progress {
-    background: #f4c430;
-    color: #fff;
-}
-.status-done {
-    background: #28a745;
-    color: #fff;
-}
-.status-progress {
-    background: #17a2b8;
-    color: #fff;
-}
-.status-canceled {
-    background: #dc3545;
-    color: #fff;
-}
-.status-default {
-    background: #6c757d;
-    color: #fff;
-}
-
-/* Status Dropdown */
 .status-dropdown {
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #6ca8f0;
-    color: white;
-    font-weight: bold;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    border: 2px solid transparent;
-    transition: background 0.3s ease, border 0.3s ease;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
-.status-dropdown:hover {
-    background-color: #4a90e2;
-    border-color: #357ab7;
-}
-
-/* Tasks Section */
 .tasks {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 .task-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f9f9f9;
+    background: #f5f5f5;
     padding: 12px;
-    margin-bottom: 12px;
-    border-radius: 8px;
+    margin: 8px 0;
+    border-radius: 5px;
     font-size: 14px;
     font-weight: 500;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.08);
 }
-.task-item:hover {
-    background: #eceff1;
-}
-
-/* Task Dropdown */
-.task-dropdown {
-    padding: 6px 12px;
-    border-radius: 6px;
-    background-color: #4a90e2;
+.status-dropdown.to-do {
+    background-color: #6c757d;
     color: white;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
 }
-.task-dropdown:hover {
-    background-color: #357ab7;
+.status-dropdown.in-progress {
+    background-color: #ffc107;
+    color: black;
+}
+.status-dropdown.in-review {
+    background-color: #17a2b8;
+    color: white;
+}
+.status-dropdown.completed {
+    background-color: #28a745;
+    color: white;
 }
 
-/* Right Column Sections */
-.section {
-    margin-bottom: 20px;
-}
-.section p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #555;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
