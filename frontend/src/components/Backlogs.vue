@@ -72,7 +72,10 @@ watch([sprints_data, task_data], () => {
                 } 
             }
             console.log(sprints_data)
-            get_tasks()
+            let resp = get_tasks()
+            if(!resp || resp.length < 1 ) {
+                setTimeout(() => {resp = get_tasks()} ,10000)
+            }
         })
         .catch(function (error) {
             console.log(error)

@@ -116,7 +116,7 @@ function saveProject(result, token) {
 
             if (projectId) {
                 notifications.value.callback = () => {
-                    // router.push({ name: 'backlog', params: { id: projectId } });
+                    router.push({ name: 'backlog', params: { id: projectId } });
                 };
             }
         })

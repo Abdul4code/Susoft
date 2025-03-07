@@ -82,7 +82,9 @@
                     </div>
                     <div class="goals-dropdown" :class="{'foldsubbar': !model.styles.project_nav_open, 'unfoldsubbar': model.styles.project_nav_open}">
                         <p v-for="(project, index) in projects" :key="index">
-                            <a :href="`${base_url}backlogs/${project.id}`" class="nav-link">{{ project.name }}</a>
+                            <router-link :to="`/backlogs/${project.id}`" class="nav-link">
+                                {{ project.name }}
+                            </router-link>
                         </p>
                         <p><a href="#" class="nav-link"> Add Project </a> </p>
                     </div>
@@ -100,19 +102,12 @@
                         <p><a href="#" class="nav-link"> Add Sprint </a> </p>
                     </div>
                 </li>
-                <li :class="{'nav-active': model.styles.contributors_nav_open}" @click.prevent="toggle_subnav('Contacts')"> 
-                    <div class="nav-header">
-                        <span class="nav-text"> Contributors </span><span class="down-icon"> 
-                        <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.contributors_nav_open}"/></span>
-                    </div>
-                    <div class="contacts-dropdown" :class="{'foldsubbar': !model.styles.contributors_nav_open, 'unfoldsubbar': model.styles.contributors_nav_open}">
-                        <p> Abdul4code </p>
-                        <p> ersirleem </p>
-                        <p> mrcrdr </p>
-                        <p> melissapuerto </p>
-                        <p><a href="#" class="nav-link"> Add contributor </a> </p>
-                    </div>
+                
+                <li> <router-link :to="base_url + 'sprint/1'" class="list">
+                        <span class="nav-text">Kanban Board</span>
+                    </router-link>
                 </li>
+                <li> <a class="list" :href="base_url + 'retrospective/1'"> <span class="nav-text">Retrospective</span></a></li>
             </ul>
             <ul class="right-nav">
                 <div class="left-right-nav">
