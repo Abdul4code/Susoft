@@ -30,6 +30,8 @@ const notifications = ref({
     duration: 2000
 })
 
+const susaf_response = ref('')
+
 // Modal state
 const showModal = ref(false)
 const projectToken = ref('') // Stores user input
@@ -76,13 +78,18 @@ function generate_project(token) {
 
     axios.post(`/api/v1/recommendations/${token}`)
         .then(function (response) {
+            susaf_response.value = response.data
             saveProject(response, token)
+            
         })
         .catch(function (error) {
+            console.log(error)
             notifications.value.show = true;
             notifications.value.message = error.response?.data?.message || "Error fetching project";
             notifications.value.type = "error";
         });
+
+    
 }
 
 function saveProject(result, token) {
@@ -98,6 +105,7 @@ function saveProject(result, token) {
         description: project_data.value.description
     })
         .then(function (response) {
+            console.log(response)
             generateDefaultBacklogsSprint(response.data.id)
 
             notifications.value.show = true;
@@ -109,11 +117,12 @@ function saveProject(result, token) {
 
             if (projectId) {
                 notifications.value.callback = () => {
-                    router.push({ name: 'backlog', params: { id: projectId } });
+                    // router.push({ name: 'backlog', params: { id: projectId } });
                 };
             }
         })
         .catch(function (error) {
+            console.log(error)
             notifications.value.show = true;
             notifications.value.message = error.response?.data?.message || "Error saving project";
             notifications.value.type = "error";
@@ -128,7 +137,7 @@ function generateDefaultBacklogsSprint(project_id){
         project: project_id
     })
         .then(function (response) {
-            generateBacklogs(response.data.id)
+            generateBacklogs(response.data.id, susaf_response.value)
         })
         .catch(function (error) {
             console.log(error)
@@ -138,61 +147,77 @@ function generateDefaultBacklogsSprint(project_id){
         });
 }
 
-function generateBacklogs(sprint_id){
-    var tasks = [
-        {
-            'title': 'Create an Hate speech Detection functionality',
-            'description': 'This functionality should allow people who are natural believers of independence to overcome same',
-            'type': 'positive',
-            'sprint':sprint_id,
-            'impact': ['economic', 'social'],
-            'metrics': [
-                {
-                    'text': "Does the implemented code suggest user sustainability",
-                    'status': 'done'
-                }
-            ]
-        },
-        {
-            'title': 'Open the figure of the National Assemby',
-            'description': 'This functionality should allow people who are natural believers of independence to overcome same',
-            'type': 'negative',
-            'sprint':sprint_id,
-            'impact': ['economic', 'social', 'environmental'],
-            'metrics': [
-                {
-                    'text': "Is it necessary to obtain this",
-                    'status': 'done'
-                },
-                {
-                    'text': "Is it necessary to obtain this",
-                    'status': 'done'
-                }
-            ]
-        },
-        {
-            'title': 'Open the figure of the National Assemby',
-            'description': 'This functionality should allow people who are natural believers of independence to overcome same',
-            'type': 'negative',
-            'sprint':sprint_id,
-            'impact': ['economic', 'social', 'environmental'],
-            'metrics': [
-                {
-                    'text': "Is it necessary to obtain this",
-                    'status': 'done'
-                },
-                {
-                    'text': "Is it necessary to obtain this",
-                    'status': 'done'
-                }
-            ]
-        }
-    ]
 
-    for (const task of tasks) {
-        send_task(task)
-    }
+function generateBacklogs(sprint_id, response_data){
+    axios.post('http://129.213.86.120:5000/generate-backlog', response_data)
+        .then(function (response) {
+            let tasks = response.data.map(data => ({
+                ...data, 
+                sprint: sprint_id 
+            }));
 
+            console.log(tasks)
+
+            for (const task of tasks) {
+                send_task(task)
+            }
+        })
+        .catch(function (error) {
+            console.log(error)
+            notifications.value.show = true;
+            notifications.value.message = error.response?.data?.message || "Error saving project";
+            notifications.value.type = "error";
+        });
+
+    // var tasks = [
+    //     {
+    //         'title': 'Create an Hate speech Detection functionality',
+    //         'description': 'This functionality should allow people who are natural believers of independence to overcome same',
+    //         'type': 'positive',
+    //         'sprint':sprint_id,
+    //         'impact': ['economic', 'social'],
+    //         'metrics': [
+    //             {
+    //                 'text': "Does the implemented code suggest user sustainability",
+    //                 'status': 'done'
+    //             }
+    //         ]
+    //     },
+    //     {
+    //         'title': 'Open the figure of the National Assemby',
+    //         'description': 'This functionality should allow people who are natural believers of independence to overcome same',
+    //         'type': 'negative',
+    //         'sprint':sprint_id,
+    //         'impact': ['economic', 'social', 'environmental'],
+    //         'metrics': [
+    //             {
+    //                 'text': "Is it necessary to obtain this",
+    //                 'status': 'done'
+    //             },
+    //             {
+    //                 'text': "Is it necessary to obtain this",
+    //                 'status': 'done'
+    //             }
+    //         ]
+    //     },
+    //     {
+    //         'title': 'Open the figure of the National Assemby',
+    //         'description': 'This functionality should allow people who are natural believers of independence to overcome same',
+    //         'type': 'negative',
+    //         'sprint':sprint_id,
+    //         'impact': ['economic', 'social', 'environmental'],
+    //         'metrics': [
+    //             {
+    //                 'text': "Is it necessary to obtain this",
+    //                 'status': 'done'
+    //             },
+    //             {
+    //                 'text': "Is it necessary to obtain this",
+    //                 'status': 'done'
+    //             }
+    //         ]
+    //     }
+    // ]
 }
 
 function send_task(task){
@@ -211,6 +236,7 @@ function send_task(task){
             }
         })
         .catch(function (error) {
+            console.log(error)
             notifications.value.show = true;
             notifications.value.message = error.response?.data?.message || "Error saving project";
             notifications.value.type = "error";

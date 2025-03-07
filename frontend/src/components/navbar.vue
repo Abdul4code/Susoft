@@ -1,5 +1,6 @@
 <script setup>
     import {ref} from 'vue'
+    import axios from 'axios'
 
     const model = ref({
         styles : {
@@ -10,6 +11,8 @@
             "contributors_nav_open": false
         }
     })
+
+    const projects = ref("")
 
     const base_url = import.meta.env.BASE_URL
     
@@ -40,6 +43,21 @@
         }
     }
 
+    function get_project(){
+        axios.get(`http://localhost:8000/susaf/projects/`)
+            .then(function (response) {
+                projects.value = response.data
+            })
+            .catch(function (error) {
+                console.log(error)
+                alert(error)
+            });
+    }
+
+    get_project()
+
+
+
 </script>
 
 <template>
@@ -57,16 +75,15 @@
 
         <nav class="nav">
             <ul class="left-nav"> 
-                <li> <span class="nav-text">Learning Hub</span></li>
+                <li> <a class="list" :href="base_url + 'learninghub'"> <span class="nav-text">Learning Hub</span></a></li>
                 <li :class="{'nav-active': model.styles.project_nav_open}" @click.prevent="toggle_subnav('Goals')">
                     <div class="nav-header"><span class="nav-text">Projects</span> 
                         <span class="down-icon"> <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.project_nav_open}"/></span>
                     </div>
                     <div class="goals-dropdown" :class="{'foldsubbar': !model.styles.project_nav_open, 'unfoldsubbar': model.styles.project_nav_open}">
-                        <p> Ecommerce Project </p>
-                        <p> University Project </p>
-                        <p> Tiktok App creation Project </p>
-                        <p> Monetization Project </p>
+                        <p v-for="(project, index) in projects" :key="index">
+                            <a :href="`${base_url}backlogs/${project.id}`" class="nav-link">{{ project.name }}</a>
+                        </p>
                         <p><a href="#" class="nav-link"> Add Project </a> </p>
                     </div>
                 </li>

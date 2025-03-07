@@ -74,7 +74,7 @@
 .nav-link{
     margin-top: 100px !important;
     color: rgba(83, 165, 72, 1);
-    text-decoration: none;   
+    text-decoration: none;
 }
 
 .left-nav{
@@ -180,6 +180,11 @@
     color: rgba(102, 102, 102, 0.8);
     font-size: 14px;
     font-weight: 500;
+}
+
+.left-nav li a{
+    text-decoration: none;
+    color: rgba(102, 102, 102, 0.8);
 }
 
 .down-icon{
@@ -352,6 +357,12 @@
         font-size: 12px;
         font-weight: 600;
         font-family: Rubik;
+    
+    }
+
+    .list{
+        text-decoration: none;
+        color: red !important;
     }
 
     .nav-text{
@@ -417,6 +428,10 @@
 
     .nav-active{
         padding-bottom: calc(10px - 5px) !important;
+    }
+
+    li{
+        text-decoration: none;
     }
 }
 

@@ -3,6 +3,11 @@
     height: 100vh;
 }
 
+a{
+    text-decoration: none;
+    color: white;
+}
+
 .empty-body{
     display: flex;
     min-height: calc(100vh - 80px);
