@@ -10,13 +10,15 @@ const taskStatus = ref({
     mainStatus: 'All',
     metrics: [
         { name: 'Has at least one sustainability practice/criteria', status: 'To do' },
-        { name: 'Must include a sustainability impact summary', status: 'To do' },
-        { name: 'The software must aim to reduce CO₂ emissions over time', status: 'In progress' },
-        { name: 'Is it using a green cloud region?', status: 'In progress' },
-        { name: 'Does it reduce repetitive database hits?', status: 'In review' },
-        { name: 'Gather program requirements', status: 'In review' },
-        { name: 'The task implementation does not introduce redundant or inefficient processing', status: 'Completed' },
-        { name: 'Task Rework Rate', status: 'Completed' }
+        { name: 'Ensure sustainability considerations are included in the task description', status: 'To do' },
+        { name: 'Identify sustainability objectives related to the task', status: 'To do' },
+        { name: "Assign sustainability-related labels ('energy efficient', 'low carbon')", status: 'To do' },
+        { name: 'Implement green coding practices (optimized queries, efficient algorithms)', status: 'In progress' },
+        { name: 'Ensure that cloud services are deployed in low-carbon data centers', status: 'In progress' },
+        { name: 'Validate that the feature sustainability benchmarks/criteria were achieved', status: 'In review' },
+        { name: 'Ensure the UI follows accessibility', status: 'In review' },
+        { name: 'Document sustainability impact in sprint reports', status: 'Completed' },
+        { name: 'Generate sustainability KPIs', status: 'Completed' }
     ]
 });
 
