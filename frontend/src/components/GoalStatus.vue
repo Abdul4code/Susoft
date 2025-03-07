@@ -75,8 +75,8 @@
         <div class="goal_header"> 
             <p> {{ status_item.title }} </p>
             <p class="header-icons">
-                <img src="../assets/images/Edit.svg" alt="">
-                <img src="../assets/images/Trash.svg" alt="">
+                <img src="../assets/images/edit.svg" alt="">
+                <img src="../assets/images/trash.svg" alt="">
             </p>
         </div>
         <div class="status_bar_cont"><div v-for="i in items_count" :class="{status_level: i <= props.status_id}" class="status_bar"></div></div>
