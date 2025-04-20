@@ -1,111 +1,102 @@
 <script setup>
-  import { ref, watch  } from "vue";
+  import { ref, watch } from "vue";
   import draggable from "vuedraggable";
   import { useRoute } from 'vue-router';
-  import axios from 'axios'
+  import axios from 'axios';
   import router from '@/router';
 
   const route = useRoute();
 
   const projectId = route.params.id;
 
-  //project details
+  // Project details
   const project = ref({
     title: "",
     description: ""
-  })
+  });
 
-  const sprints_data = ref([])
-  const task_data = ref([])
-  
+  const sprints_data = ref([]);
+  const task_data = ref([]);
+
   // Reactive state
   const sprints = ref([]);
 
-  //watcher
-watch([sprints_data, task_data], () => {
-    for(const sprint_data of sprints_data.value){
-        var sprint = {
-            id: sprint_data.id,
-            name:sprint_data.title,
-            editing: false,
-            tasks: [
+  // Backend base URL from environment variables
+  const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
-            ]
+  // Watcher
+  watch([sprints_data, task_data], () => {
+    for (const sprint_data of sprints_data.value) {
+      var sprint = {
+        id: sprint_data.id,
+        name: sprint_data.title,
+        editing: false,
+        tasks: []
+      };
+      for (var i = 0; i < task_data.value.length; i++) {
+        if (task_data.value[i].sprint == sprint.id) {
+          let task = { id: task_data.value[i].id, name: task_data.value[i].title };
+          sprint.tasks.push(task);
         }
-        for(var i = 0; i < task_data.value.length; i++){
-            console.log(task_data.value[i].sprint, sprint.id)
-            if(task_data.value[i].sprint == sprint.id){
-                let task = {id:task_data.value[i].id, name:task_data.value[i].title}
-                sprint.tasks.push(task)
-            }
-        }
+      }
     }
-    sprints.value.push(sprint)
-}, { deep: true });
-  
+    sprints.value.push(sprint);
+  }, { deep: true });
+
   // Methods
- function get_project(){
+  function get_project() {
+    axios.get(`${backendBaseUrl}/susaf/projects/${projectId}`)
+      .then(function (response) {
+        project.value.title = response.data.name;
+        project.value.description = response.data.description;
 
-    axios.get(`http://129.213.86.120:8000/susaf/projects/${projectId}`)
-        .then(function (response) {
-            project.value.title = response.data.name
-            project.value.description = response.data.description
+        get_sprints(projectId);
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert(error);
+      });
+  }
 
-            get_sprints(projectId)
+  function get_sprints(project_id) {
+    axios.get(`${backendBaseUrl}/susaf/sprints/`)
+      .then(function (response) {
+        for (const sprint of response.data) {
+          if (sprint.project == project_id) {
+            sprints_data.value.push(sprint);
+          }
+        }
+        let resp = get_tasks();
+        if (!resp || resp.length < 1) {
+          setTimeout(() => { resp = get_tasks(); }, 10000);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert(error);
+      });
+  }
 
-            console.log(sprints)
-
-            
-        })
-        .catch(function (error) {
-            console.log(error)
-            alert(error)
-        });
- }
-
- function get_sprints(project_id){
-    axios.get(`http://129.213.86.120:8000/susaf/sprints/`)
-        .then(function (response) {
-            for (const sprint of response.data) {
-                if(sprint.project == project_id){
-                    sprints_data.value.push(sprint)
-                } 
+  function get_tasks() {
+    axios.get(`${backendBaseUrl}/susaf/tasks/`)
+      .then(function (response) {
+        for (const task of response.data) {
+          // Loop through each sprint in sprints_data
+          for (var i = 0; i < sprints_data.value.length; i++) {
+            // Check if task's sprint matches the current sprint
+            if (sprints_data.value[i].id == task.sprint) {
+              task_data.value.push(task); // Push the task into task_data
             }
-            console.log(sprints_data)
-            let resp = get_tasks()
-            if(!resp || resp.length < 1 ) {
-                setTimeout(() => {resp = get_tasks()} ,10000)
-            }
-        })
-        .catch(function (error) {
-            console.log(error)
-            alert(error)
-        });
- }
+          }
+        }
+      })
+      .catch(function (error) {
+        console.error(error); // Log the error
+        alert(error); // Show an alert with the error message
+      });
+  }
 
- function get_tasks() {
-    axios.get('http://129.213.86.120:8000/susaf/tasks/')
-        .then(function (response) {
-            for (const task of response.data) {
-                // Loop through each sprint in sprints_data
-                for (var i = 0; i < sprints_data.value.length; i++) {     
-                    // Check if task's sprint matches the current sprint
-                    if (sprints_data.value[i].id == task.sprint) {
-                        task_data.value.push(task);  // Push the task into task_data
-                    }
-                }
-            }
-
-            console.log(sprints_data)
-
-        })
-        .catch(function (error) {
-            console.error(error);  // Log the error
-            alert(error);  // Show an alert with the error message
-        });
-}
-
- get_project()
+  get_project();
 
   const addSprint = () => {
     sprints_data.value.push({
@@ -114,11 +105,11 @@ watch([sprints_data, task_data], () => {
       title: "Untitled Sprint"
     });
   };
-  
+
   const editSprint = (sprint) => {
     sprint.editing = true;
   };
-  
+
   const stopEditing = (sprint) => {
     sprint.editing = false;
   };
@@ -126,7 +117,7 @@ watch([sprints_data, task_data], () => {
   const goToTaskDetail = (taskId) => {
     router.push({ name: 'detail', params: { id: taskId } });
   };
-  </script>
+</script>
 
 <template>
     <div class="container">
@@ -261,4 +252,3 @@ watch([sprints_data, task_data], () => {
     background: #0056b3;
   }
   </style>
-  

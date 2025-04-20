@@ -14,6 +14,7 @@ const model = ref({
 
 const projects = ref("");
 const base_url = import.meta.env.BASE_URL;
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
 function open_nav() {
     model.value.styles.navbar_open = true;
@@ -41,7 +42,7 @@ function toggle_subnav(nav) {
 }
 
 function get_project() {
-    axios.get(`http://129.213.86.120:8000/susaf/projects/`)
+    axios.get(`${backendBaseUrl}/susaf/projects/`)
         .then(function (response) {
             projects.value = response.data;
         })

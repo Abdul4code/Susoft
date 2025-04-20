@@ -1,23 +1,23 @@
 <script setup>
 import router from '@/router';
-import axios from 'axios'
-import { ref, onMounted } from 'vue'
-import Toast from '../components/toasts.vue'
-import Navbar from '../components/navbar.vue'
-import Susaf from '../components/Susaf.vue'
+import axios from 'axios';
+import { ref, onMounted } from 'vue';
+import Toast from '../components/toasts.vue';
+import Navbar from '../components/navbar.vue';
+import Susaf from '../components/Susaf.vue';
 
 const model = ref({
     status: {
         goal_open: true,
         fresh_page: false
     }
-})
+});
 
 const project_data = ref({
     name: '',
     token: '',
     description: '',
-})
+});
 
 const notifications = ref({
     message: "",
@@ -26,243 +26,199 @@ const notifications = ref({
     show: false,
     wide: 45,
     callback: () => { },
-    duration: 2000
-})
+    get duration() {
+        return this.type === "success" ? 2000 : 4000;
+    }
+});
 
-const susaf_response = ref('')
-
-// Modal state
-const showModal = ref(false)
-const projectToken = ref('') // Stores user input
+const susaf_response = ref('');
+const showModal = ref(false);
+const showProgressModal = ref(false);
+const projectToken = ref('');
+const progress = ref(0);
+const progressMessage = ref('');
 
 function close_toast() {
-    notifications.value.show = false
-    notifications.value.callback()
+    notifications.value.show = false;
+    notifications.value.callback();
 }
 
 onMounted(() => {
-    model.value.status.fresh_page = true
-})
+    model.value.status.fresh_page = true;
+});
 
 function toggleCreateGoal() {
-    model.value.status.goal_open = !model.value.status.goal_open
-    model.value.status.fresh_page = false
+    model.value.status.goal_open = !model.value.status.goal_open;
+    model.value.status.fresh_page = false;
 }
 
-// Show modal when button is clicked
 function openModal() {
-    showModal.value = true
+    showModal.value = true;
 }
 
-// Hide modal
 function closeModal() {
-    showModal.value = false
+    showModal.value = false;
 }
 
-// Get project with user input token
-function submitProjectToken() {
+async function submitProjectToken() {
     if (!projectToken.value) {
-        notifications.value.show = true;
-        notifications.value.message = "Project token is required";
-        notifications.value.type = "error";
+        showNotification("Project token is required", "error");
         return;
     }
 
-    closeModal(); // Close modal
-    generate_project(projectToken.value); // Call API with user input token
+    closeModal();
+    showProgressModal.value = true;
+    progress.value = 0;
+    progressMessage.value = "Fetching project data...";
+    await generate_project(projectToken.value);
+    showProgressModal.value = false;
 }
 
-function generate_project(token) {
-    axios.defaults.baseURL = 'https://api.susaf.se4gd.eu';
+async function generate_project(token) {
+    try {
+        axios.defaults.baseURL = 'https://api.susaf.se4gd.eu';
+        const response = await axios.post(`/api/v1/recommendations/${token}`);
+        susaf_response.value = response.data;
 
-    axios.post(`/api/v1/recommendations/${token}`)
-        .then(function (response) {
-            susaf_response.value = response.data
-            saveProject(response, token)
-            
-        })
-        .catch(function (error) {
-            console.log(error)
-            notifications.value.show = true;
-            notifications.value.message = error.response?.data?.message || "Error fetching project";
-            notifications.value.type = "error";
+        if (response.data.error) {
+            showNotification(response.data.error, "error");
+        } else {
+            progress.value = 25;
+            progressMessage.value = "Saving project...";
+            await saveProject(response.data, token);
+        }
+    } catch (error) {
+        showNotification(error.response?.data?.message || "Error fetching project", "error");
+    }
+}
+
+async function saveProject(data, token) {
+    try {
+        const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+        axios.defaults.baseURL = backendBaseUrl;
+
+        project_data.value = {
+            name: data.project_name,
+            token,
+            description: data.project_description
+        };
+
+        const response = await axios.post(`${backendBaseUrl}/susaf/projects/`, {
+            name: project_data.value.name,
+            token: project_data.value.token,
+            description: project_data.value.description
         });
 
-    
+        progress.value = 50;
+        progressMessage.value = "Generating default backlogs...";
+        await generateDefaultBacklogsSprint(response.data.id);
+        showNotification("Your project was successfully created", "success");
+
+        notifications.value.callback = () => {
+            router.push({ name: 'backlog', params: { id: response.data.id } });
+        };
+    } catch (error) {
+        showNotification(error.response?.data?.message || "You cannot use a token multiple times. Regenerate your token", "error");
+    }
 }
 
-function saveProject(result, token) {
-    project_data.value.name = result.data.project_name
-    project_data.value.token = token
-    project_data.value.description = result.data.project_description
+async function generateDefaultBacklogsSprint(project_id) {
+    try {
+        const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+        axios.defaults.baseURL = backendBaseUrl;
 
-    axios.defaults.baseURL = 'http://129.213.86.120:8000';
-
-    axios.post('http://129.213.86.120:8000/susaf/projects/', {
-        name: project_data.value.name,
-        token: project_data.value.token,
-        description: project_data.value.description
-    })
-        .then(function (response) {
-            console.log(response)
-            generateDefaultBacklogsSprint(response.data.id)
-
-            notifications.value.show = true;
-            notifications.value.message = "Your project was successfully created";
-            notifications.value.type = "success";
-            
-                    // Ensure response contains the expected project ID
-            const projectId = response.data?.id; 
-
-            if (projectId) {
-                notifications.value.callback = () => {
-                    router.push({ name: 'backlog', params: { id: projectId } });
-                };
-            }
-        })
-        .catch(function (error) {
-            console.log(error)
-            notifications.value.show = true;
-            notifications.value.message = error.response?.data?.message || "Error saving project";
-            notifications.value.type = "error";
+        const response = await axios.post(`${backendBaseUrl}/susaf/sprints/`, {
+            title: "Backlogs",
+            project: project_id
         });
+
+        progress.value = 75;
+        progressMessage.value = "Generating backlogs...";
+        await generateBacklogs(response.data.id, susaf_response.value);
+    } catch (error) {
+        showNotification(error.response?.data?.message || "Error saving project", "error");
+    }
 }
 
-function generateDefaultBacklogsSprint(project_id){
-    axios.defaults.baseURL = 'http://129.213.86.120:8000';
+async function generateBacklogs(sprint_id, response_data) {
+    const maxRetries = 5; // Maximum number of retries
+    let attempt = 0;
 
-    axios.post('http://129.213.86.120:8000/susaf/sprints/', {
-        title: "Backlogs",
-        project: project_id
-    })
-        .then(function (response) {
-            generateBacklogs(response.data.id, susaf_response.value)
-        })
-        .catch(function (error) {
-            console.log(error)
-            notifications.value.show = true;
-            notifications.value.message = error.response?.data?.message || "Error saving project";
-            notifications.value.type = "error";
-        });
-}
+    while (attempt < maxRetries) {
+        try {
+            const backendBaseUrl = import.meta.env.VITE_AI_BACKEND_BASE_URL;
+            const data = { message: response_data };
 
+            const response = await axios.post(`${backendBaseUrl}/generate-backlog`, data);
 
-function generateBacklogs(sprint_id, response_data){
-    axios.post('http://129.213.86.120:5000/generate-backlog', response_data)
-        .then(function (response) {
-            let tasks = response.data.map(data => ({
-                ...data, 
-                sprint: sprint_id 
-            }));
-
-            console.log(tasks)
-
+            const tasks = response.data.map(task => ({ ...task, sprint: sprint_id }));
             for (const task of tasks) {
-                send_task(task)
+                progressMessage.value = `Sending task: ${task.title}`;
+                await send_task(task);
             }
-        })
-        .catch(function (error) {
-            console.log(error)
-            notifications.value.show = true;
-            notifications.value.message = error.response?.data?.message || "Error saving project";
-            notifications.value.type = "error";
-        });
+            progress.value = 100;
+            progressMessage.value = "Backlogs generated successfully!";
+            return; // Exit the function if successful
+        } catch (error) {
+            attempt++;
+            console.error(`Attempt ${attempt} failed:`, error);
 
-    // var tasks = [
-    //     {
-    //         'title': 'Create an Hate speech Detection functionality',
-    //         'description': 'This functionality should allow people who are natural believers of independence to overcome same',
-    //         'type': 'positive',
-    //         'sprint':sprint_id,
-    //         'impact': ['economic', 'social'],
-    //         'metrics': [
-    //             {
-    //                 'text': "Does the implemented code suggest user sustainability",
-    //                 'status': 'done'
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         'title': 'Open the figure of the National Assemby',
-    //         'description': 'This functionality should allow people who are natural believers of independence to overcome same',
-    //         'type': 'negative',
-    //         'sprint':sprint_id,
-    //         'impact': ['economic', 'social', 'environmental'],
-    //         'metrics': [
-    //             {
-    //                 'text': "Is it necessary to obtain this",
-    //                 'status': 'done'
-    //             },
-    //             {
-    //                 'text': "Is it necessary to obtain this",
-    //                 'status': 'done'
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         'title': 'Open the figure of the National Assemby',
-    //         'description': 'This functionality should allow people who are natural believers of independence to overcome same',
-    //         'type': 'negative',
-    //         'sprint':sprint_id,
-    //         'impact': ['economic', 'social', 'environmental'],
-    //         'metrics': [
-    //             {
-    //                 'text': "Is it necessary to obtain this",
-    //                 'status': 'done'
-    //             },
-    //             {
-    //                 'text': "Is it necessary to obtain this",
-    //                 'status': 'done'
-    //             }
-    //         ]
-    //     }
-    // ]
+            if (attempt >= maxRetries) {
+                showNotification(
+                    error.response?.data?.message || "Error generating backlogs after multiple attempts",
+                    "error"
+                );
+            } else {
+                progressMessage.value = `Retrying to generate backlogs... (Attempt ${attempt + 1})`;
+            }
+        }
+    }
 }
 
-function send_task(task){
-    axios.defaults.baseURL = 'http://129.213.86.120:8000';
+async function send_task(task) {
+    try {
+        const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+        axios.defaults.baseURL = backendBaseUrl;
 
-        axios.post('http://129.213.86.120:8000/susaf/tasks/', {
+        task.impact = task.impact.map(impact => impact.toLowerCase());
+
+        const response = await axios.post(`${backendBaseUrl}/susaf/tasks/`, {
             title: task.title,
             description: task.description,
             type: task.type,
-            sprint:task.sprint,
+            sprint: task.sprint,
             impact: task.impact,
-        })
-        .then(function (response) {
-            for (const metric of task.metrics) {
-                send_metric(metric, response.data.id)
-            }
-        })
-        .catch(function (error) {
-            console.log(error)
-            notifications.value.show = true;
-            notifications.value.message = error.response?.data?.message || "Error saving project";
-            notifications.value.type = "error";
         });
+
+        for (const metric of task.metrics) {
+            await send_metric(metric, response.data.id);
+        }
+    } catch (error) {
+        showNotification(error.response?.data?.message || "Error sending task", "error");
+    }
 }
 
-function send_metric(metric, task_id){
-    axios.defaults.baseURL = 'http://129.213.86.120:8000';
+async function send_metric(metric, task_id) {
+    try {
+        const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+        axios.defaults.baseURL = backendBaseUrl;
 
-        axios.post('http://129.213.86.120:8000/susaf/metrics/', {
+        await axios.post(`${backendBaseUrl}/susaf/metrics/`, {
             text: metric.text,
             status: metric.status,
             task: task_id
-        })
-        .then(function (response) {
-
-        })
-        .catch(function (error) {
-            console.log(error)
-            notifications.value.show = true;
-            notifications.value.message = error.response?.data?.message || "Error saving project";
-            notifications.value.type = "error";
         });
+    } catch (error) {
+        showNotification(error.response?.data?.message || "Error sending metric", "error");
+    }
 }
 
+function showNotification(message, type) {
+    notifications.value.message = message;
+    notifications.value.type = type;
+    notifications.value.show = true;
+}
 </script>
-
 
 <template>
     <section class="container">
@@ -280,6 +236,17 @@ function send_metric(metric, task_id){
                 <div class="modal-actions">
                     <button class="modal-btn confirm" @click="submitProjectToken">Submit</button>
                     <button class="modal-btn cancel" @click="closeModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Modal -->
+        <div v-if="showProgressModal" class="modal-overlay">
+            <div class="modal">
+                <h2>Progress</h2>
+                <p>{{ progressMessage }}</p>
+                <div class="progress-bar">
+                    <div class="progress" :style="{ width: progress + '%' }"></div>
                 </div>
             </div>
         </div>
@@ -310,6 +277,7 @@ function send_metric(metric, task_id){
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .modal {
@@ -354,5 +322,21 @@ function send_metric(metric, task_id){
 .modal-btn.cancel {
     background: #f44336;
     color: white;
+}
+
+/* Progress Bar Styles */
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress {
+    height: 100%;
+    background: #4CAF50;
+    transition: width 0.3s ease;
 }
 </style>
