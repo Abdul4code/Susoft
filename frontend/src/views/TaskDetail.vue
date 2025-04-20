@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import Navbar from '../components/navbar.vue';
 import router from '@/router';
 import { useRoute } from 'vue-router';
-import axios from 'axios'
+import axios from 'axios';
 
 const route = useRoute();
 
@@ -49,17 +49,20 @@ const statusClass = (status) => {
     };
 };
 
-function getTask(taskId){
-    axios.get(`http://129.213.86.120:8000/susaf/tasks/${taskId}`)
+// Use the base backend URL from environment variables
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
+function getTask(taskId) {
+    axios.get(`${backendBaseUrl}/susaf/tasks/${taskId}`)
         .then(function (response) {
-            taskDetail.value = response.data
+            taskDetail.value = response.data;
         })
         .catch(function (error) {
-            alert(error)
+            alert(error);
         });
 }
 
-getTask(taskid)
+getTask(taskid);
 </script>
 
 

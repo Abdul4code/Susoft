@@ -24,85 +24,96 @@
   // Backend base URL from environment variables
   const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
+  
+  // process the display data for sprints and tasks
   // Watcher
-  watch([sprints_data, task_data], () => {
+  function processData (){
+    console.log(sprints_data.value, task_data.value);
     for (const sprint_data of sprints_data.value) {
-      var sprint = {
+      const sprint = {
         id: sprint_data.id,
         name: sprint_data.title,
         editing: false,
         tasks: []
       };
-      for (var i = 0; i < task_data.value.length; i++) {
+      for (let i = 0; i < task_data.value.length; i++) {
         if (task_data.value[i].sprint == sprint.id) {
-          let task = { id: task_data.value[i].id, name: task_data.value[i].title };
+          const task = { id: task_data.value[i].id, name: task_data.value[i].title };
           sprint.tasks.push(task);
         }
       }
+      sprints.value.push(sprint);
+      console.log(sprints.value);
     }
-    sprints.value.push(sprint);
-  }, { deep: true });
+  }
+
+
+  
 
   // Methods
-  function get_project() {
-    axios.get(`${backendBaseUrl}/susaf/projects/${projectId}`)
-      .then(function (response) {
-        project.value.title = response.data.name;
-        project.value.description = response.data.description;
+  async function get_project() {
+    try {
+      const response = await axios.get(`${backendBaseUrl}/susaf/projects/${projectId}`);
+      project.value.title = response.data.name;
+      project.value.description = response.data.description;
 
-        get_sprints(projectId);
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert(error);
-      });
+      await get_sprints(projectId);
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
   }
 
-  function get_sprints(project_id) {
-    axios.get(`${backendBaseUrl}/susaf/sprints/`)
-      .then(function (response) {
-        for (const sprint of response.data) {
-          if (sprint.project == project_id) {
-            sprints_data.value.push(sprint);
-          }
+  async function get_sprints(project_id) {
+    try {
+      const response = await axios.get(`${backendBaseUrl}/susaf/sprints/`);
+      for (const sprint of response.data) {
+        if (sprint.project == project_id) {
+          sprints_data.value.push(sprint);
         }
-        let resp = get_tasks();
-        if (!resp || resp.length < 1) {
-          setTimeout(() => { resp = get_tasks(); }, 10000);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert(error);
-      });
+      }
+      const resp = await get_tasks();
+
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
   }
 
-  function get_tasks() {
-    axios.get(`${backendBaseUrl}/susaf/tasks/`)
-      .then(function (response) {
-        for (const task of response.data) {
-          // Loop through each sprint in sprints_data
-          for (var i = 0; i < sprints_data.value.length; i++) {
-            // Check if task's sprint matches the current sprint
-            if (sprints_data.value[i].id == task.sprint) {
-              task_data.value.push(task); // Push the task into task_data
-            }
+  async function get_tasks() {
+    try {
+      const response = await axios.get(`${backendBaseUrl}/susaf/tasks/`);
+      for (const task of response.data) {
+        // Loop through each sprint in sprints_data
+        for (let i = 0; i < sprints_data.value.length; i++) {
+          // Check if task's sprint matches the current sprint
+          if (sprints_data.value[i].id == task.sprint) {
+            task_data.value.push(task); // Push the task into task_data
           }
         }
-      })
-      .catch(function (error) {
-        console.error(error); // Log the error
-        alert(error); // Show an alert with the error message
-      });
+      }
+
+      processData(); // Call the function to process and display data
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
   }
 
   get_project();
 
-  const addSprint = () => {
-    sprints_data.value.push({
-      id: Date.now(),
-      project: projectId,
-      title: "Untitled Sprint"
+  const addSprint = async () => {
+ 
+    let new_sprint = await axios.post(`${backendBaseUrl}/susaf/sprints/`, {
+      title: "Untitled Sprint",
+      project: projectId
+    });
+
+    sprints.value.push({
+      id: new_sprint.data.id,
+      name: new_sprint.data.title,
+      editing: false,
+      tasks: []
     });
   };
 
@@ -110,19 +121,59 @@
     sprint.editing = true;
   };
 
-  const stopEditing = (sprint) => {
+  const stopEditing = async (sprint) => {
     sprint.editing = false;
+
+    try {
+      // Update the sprint in the database
+      await axios.put(`${backendBaseUrl}/susaf/sprints/${sprint.id}/`, {
+        title: sprint.name,
+        project: projectId
+      });
+    } catch (error) {
+      console.error("Error updating sprint:", error);
+      alert("Failed to update the sprint. Please try again.");
+    }
   };
 
   const goToTaskDetail = (taskId) => {
     router.push({ name: 'detail', params: { id: taskId } });
   };
+
+  const updateTaskSprint = async (taskId, newSprintId) => {
+    try {
+      await axios.patch(`${backendBaseUrl}/susaf/tasks/${taskId}/`, {
+        sprint: newSprintId,
+      });
+      console.log(`Task ${taskId} moved to sprint ${newSprintId}`);
+    } catch (error) {
+      console.error("Error updating task sprint:", error);
+      alert("Failed to update task's sprint.");
+    }
+  };
+
+  const onTaskDrop = async (event, newSprintId, event_to) => {
+    
+    console.log(event_to)
+    const task = event.item.querySelector('.task-name'); 
+    const taskId = task.id;
+
+    const sprint = event_to.querySelector('.task');
+    const sprintId = sprint.getAttribute('sprint_id');
+
+
+    if (taskId && sprintId) {
+      await updateTaskSprint(taskId, sprintId);
+    }
+  };
+
+
 </script>
 
 <template>
     <div class="container">
-      <h3 class="title">{{project.title}}</h3>
-      <p class="subtitle">{{project.description}}</p>
+      <h3 class="title">{{ project.title }}</h3>
+      <p class="subtitle">{{ project.description }}</p>
   
       <div v-for="sprint in sprints" :key="sprint.id" class="sprint-box">
         <!-- Editable Sprint Title -->
@@ -132,25 +183,33 @@
           @blur="stopEditing(sprint)" 
           @keyup.enter="stopEditing(sprint)"
           class="sprint-title-input"
+          
         />
         <h4 v-else class="sprint-title" @click="editSprint(sprint)">{{ sprint.name }}</h4>
   
         <!-- Draggable Task List -->
-        <draggable v-model="sprint.tasks" group="tasks" itemKey="id" class="task-list">
-          <template #item="{ element: task }">
-            <div class="task" @click="goToTaskDetail(task.id)">
-              <span class="task-name">{{ task.name }}</span>
-            </div>
-          </template>
+        <draggable
+            v-model="sprint.tasks"
+            group="tasks"
+            itemKey="id"
+            class="task-list"
+
+            @end="(event) => onTaskDrop(event, sprint.id, event.to)">
+
+            <template #item="{ element: task }">
+              <div class="task" :sprint_id="sprint.id" @click="goToTaskDetail(task.id)">
+                <span class="task-name" :id="task.id" >{{ task.name }}</span>
+              </div>
+            </template>
+
         </draggable>
-      </div>
+        </div>
   
       <div class="footer">
         <button class="add-sprint" @click="addSprint">+ Add New Sprint</button>
       </div>
     </div>
   </template>
-  
   
   <style scoped>
   /* Container */
