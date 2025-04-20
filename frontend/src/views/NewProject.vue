@@ -5,6 +5,9 @@ import { ref, onMounted } from 'vue';
 import Toast from '../components/toasts.vue';
 import Navbar from '../components/navbar.vue';
 import Susaf from '../components/Susaf.vue';
+import { useStateStore } from "../stores/state.js";
+
+const projectState = useStateStore();
 
 const model = ref({
     status: {
@@ -115,6 +118,7 @@ async function saveProject(data, token) {
         showNotification("Your project was successfully created", "success");
 
         notifications.value.callback = () => {
+            projectState.saveProjectId(response.data.id); // Set the project ID in the state store
             router.push({ name: 'backlog', params: { id: response.data.id } });
         };
     } catch (error) {

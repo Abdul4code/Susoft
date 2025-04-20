@@ -1,6 +1,10 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useStateStore } from "../stores/state.js";
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const model = ref({
     styles: {
@@ -13,8 +17,12 @@ const model = ref({
 });
 
 const projects = ref("");
+const sprints = ref([]);
+
 const base_url = import.meta.env.BASE_URL;
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
+const projectState = useStateStore();
 
 function open_nav() {
     model.value.styles.navbar_open = true;
@@ -30,7 +38,8 @@ function toggle_subnav(nav) {
         model.value.styles.sprint_nav_open = !model.value.styles.sprint_nav_open;
         model.value.styles.project_nav_open = false;
         model.value.styles.contributors_nav_open = false;
-    } else if (nav == "Goals") {
+        handleSprintdropdownClick()
+    } else if (nav == "Goals") {    
         model.value.styles.project_nav_open = !model.value.styles.project_nav_open;
         model.value.styles.contributors_nav_open = false;
         model.value.styles.sprint_nav_open = false;
@@ -41,18 +50,64 @@ function toggle_subnav(nav) {
     }
 }
 
-function get_project() {
-    axios.get(`${backendBaseUrl}/susaf/projects/`)
-        .then(function (response) {
-            projects.value = response.data;
-        })
-        .catch(function (error) {
-            console.log(error);
-            alert(error);
-        });
+async function get_project() {
+  try {
+    const response = await axios.get(`${backendBaseUrl}/susaf/projects/`);
+    projects.value = response.data;
+  } catch (error) {
+    console.error(error);
+    alert(error);
+  }
 }
 
-get_project();
+onMounted(() => {
+    projects.value = "";
+    sprints.value = [];
+
+    get_project();
+
+    console.log("Project ID from state:", projectState.state.project_id);
+
+    if (projectState.state.project_id) {
+        get_sprints(projectState.state.project_id);
+    }
+
+});
+
+function handleProjectClick(projectId) {
+    projectState.saveProjectId(projectId); // Set the project ID in the state store
+    get_sprints(projectId)
+
+
+    router.push({ name: 'backlog', params: { id: projectId} });
+    console.log(`Project clicked: ${projectState.state.project_id}`);
+}
+
+
+function handleSprintdropdownClick() {
+    let new_id = projectState.state.project_id;
+    get_sprints(new_id)
+    
+}
+
+async function get_sprints(project_id) {
+    sprints.value = [];
+
+    try {
+        const response = await axios.get(`${backendBaseUrl}/susaf/sprints/`);
+        for (const sprint of response.data) {
+            if (sprint.project == project_id) {
+                sprints.value.push(sprint);
+                console.log(sprints.value)
+            }
+            
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 </script>
 
 <template>
@@ -82,31 +137,36 @@ get_project();
                         </span>
                     </div>
                     <div class="goals-dropdown" :class="{'foldsubbar': !model.styles.project_nav_open, 'unfoldsubbar': model.styles.project_nav_open}">
-                        <p v-for="(project, index) in projects" :key="index">
-                            <a :href="`${base_url}backlogs/${project.id}`" class="nav-link">{{ project.name }}</a>
+                        <p v-for="(project, index) in projects" :key="index" @click="handleProjectClick(project.id)">
+                            <router-link :to="`/backlogs/${project.id}`" class="nav-link">{{ project.name }}</router-link>
                         </p>
                         <p><router-link to="/new_project" class="nav-link">Add Project</router-link></p>
                     </div>
                 </li>
                 <li :class="{'nav-active': model.styles.sprint_nav_open}" @click.prevent="toggle_subnav('Applications')">
                     <div class="nav-header">
-                        <span class="nav-text">Sprints</span>
+                        <span class="nav-text">Kanban Boards</span>
                         <span class="down-icon">
                             <img src="../assets/images/down.svg" :class="{'turn-dropdown-icon': model.styles.sprint_nav_open}" />
                         </span>
                     </div>
-                    <div class="applications-dropdown" :class="{'foldsubbar': !model.styles.sprint_nav_open, 'unfoldsubbar': model.styles.sprint_nav_open}">
-                        <p>Sprint 1</p>
-                        <p>Sprint 2</p>
-                        <p>Sprint 3</p>
-                        <p>Sprint 4</p>
-                        <p><router-link to="/new_project" class="nav-link">Add Sprint</router-link></p>
+                    <div class="applications-dropdown" 
+                        :class="{'foldsubbar': !model.styles.sprint_nav_open, 'unfoldsubbar': model.styles.sprint_nav_open}"
+                        >
+                        
+                        <template v-if="sprints.length > 0">
+                            <p v-for="(sprint, index) in sprints" :key="index">
+                                <router-link :to="`/sprint/${sprint.id}`" class="nav-link">{{ sprint.title }}</router-link>
+                            </p>
+                        </template>
+                        <template v-else>
+                            <p class="no-sprints nav-link">No project is selected</p>
+                        </template>
+                        
                     </div>
                 </li>
-
-                <li><router-link to="/sprint/1" class="list"><span class="nav-text">Kabban</span></router-link></li>
                 
-                <li> <a class="list" :href="base_url + 'retrospective/1'"> <span class="nav-text">Retrospective</span></a></li>
+                <li><router-link to="/retrospective/1" class="list"><span class="nav-text">Retrospective</span></router-link></li>
             </ul>
             <ul class="right-nav">
                 <div class="left-right-nav">
@@ -138,4 +198,8 @@ get_project();
 
 <style scoped>
 @import url("../assets/css/nav.css");
+
+.no-sprints {
+    color: red;
+}
 </style>

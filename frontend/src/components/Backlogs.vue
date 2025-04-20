@@ -7,7 +7,8 @@
 
   const route = useRoute();
 
-  const projectId = route.params.id;
+  const projectId = ref(route.params.id)
+
 
   // Project details
   const project = ref({
@@ -47,17 +48,30 @@
     }
   }
 
+  // Watch for route changes and re-fetch data
+  watch(
+    () => route.params.id,
+    (newId) => {
+      projectId.value = parseInt(newId, 10); // Update projectId as an integer
+      sprints_data.value = []; // Clear existing data
+      task_data.value = [];
+      sprints.value = [];
+      get_project(); // Re-fetch data for the new project ID
+      console.log(projectId.value)
+    }
+  );
+
 
   
 
   // Methods
   async function get_project() {
     try {
-      const response = await axios.get(`${backendBaseUrl}/susaf/projects/${projectId}`);
+      const response = await axios.get(`${backendBaseUrl}/susaf/projects/${projectId.value}`);
       project.value.title = response.data.name;
       project.value.description = response.data.description;
 
-      await get_sprints(projectId);
+      await get_sprints(projectId.value);
     } catch (error) {
       console.error(error);
       alert(error);
@@ -65,11 +79,13 @@
   }
 
   async function get_sprints(project_id) {
+
     try {
       const response = await axios.get(`${backendBaseUrl}/susaf/sprints/`);
       for (const sprint of response.data) {
         if (sprint.project == project_id) {
           sprints_data.value.push(sprint);
+          console.log(sprint.data)
         }
       }
       const resp = await get_tasks();
@@ -106,7 +122,7 @@
  
     let new_sprint = await axios.post(`${backendBaseUrl}/susaf/sprints/`, {
       title: "Untitled Sprint",
-      project: projectId
+      project: projectId.value
     });
 
     sprints.value.push({
@@ -128,7 +144,7 @@
       // Update the sprint in the database
       await axios.put(`${backendBaseUrl}/susaf/sprints/${sprint.id}/`, {
         title: sprint.name,
-        project: projectId
+        project: projectId.value
       });
     } catch (error) {
       console.error("Error updating sprint:", error);
