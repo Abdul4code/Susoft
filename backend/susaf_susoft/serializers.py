@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, Sprint, Task, Metrics
+from .models import Project, Sprint, Task, Metrics, RetroNote
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,3 +24,8 @@ class MetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metrics
         fields = '__all__'
+
+class RetroNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RetroNote
+        fields = '__all__'  # Include all fields in the model

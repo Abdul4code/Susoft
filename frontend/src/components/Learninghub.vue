@@ -227,12 +227,12 @@ const filteredFaqs = computed(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 20px;
+  padding: 0px;
 }
 
 .learning-hub {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 25px auto;
 }
 
 .learning-hub h1 {

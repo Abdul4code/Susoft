@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
+    "chart.js": "^4.4.9",
     "dotenv": "^16.4.5",
     "element-plus": "^2.7.6",
     "pinia": "^2.1.7",
     "swiper": "^11.1.4",
     "vue": "^3.4.29",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.3.3",
     "vuedraggable": "^4.1.0"
   },

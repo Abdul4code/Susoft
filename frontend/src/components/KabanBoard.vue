@@ -1,43 +1,118 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import SprintStatus from "../components/SprintStatus.vue";
+    import { ref, onMounted, watch } from "vue";
+    import SprintStatus from "../components/SprintStatus.vue";
+    import { useRoute } from "vue-router";
+    import axios from 'axios';
 
-const app_container = ref(null);
+    const route = useRoute();
 
-const model = ref({
-    data: {
-        status: [
-            { id: 1, order: 1, title: "To do" },
-            { id: 2, order: 2, title: "In progress" },
-            { id: 4, order: 4, title: "In review" },
-            { id: 5, order: 5, title: "Completed" },
-        ],
-        cards: [
-            { id: 101, title: "Task A", status_id: 1 },
-            { id: 102, title: "Task B", status_id: 2 },
-            { id: 103, title: "Task C", status_id: 2 },
-            { id: 104, title: "Task D", status_id: 4 },
-        ],
-    },
-});
+    const app_container = ref(null);
 
-function moveCard({ card_id, from_status, to_status }) {
-    const card = model.value.data.cards.find((c) => c.id == card_id);
-    if (card) {
-        card.status_id = to_status;
+    // Backend base URL from environment variables
+    const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
+    const model = ref({
+        data: {
+            status: [
+                { id: 1, order: 1, title: "To do" },
+                { id: 2, order: 2, title: "In progress" },
+                { id: 3, order: 3, title: "Under review" },
+                { id: 4, order: 4, title: "Completed" },
+            ],
+            cards: [],
+            sprint: ""
+        },
+    });
+
+    function convert_status_to_id(status){
+        const statusMap = {
+            "to_do": 1,
+            "in_progress": 2,
+            "under_review": 3,
+            "completed": 4,
+        };
+        return statusMap[status] || null;
+    };
+
+    async function get_sprint(sprint_id) {
+        try {
+            const response = await axios.get(`${backendBaseUrl}/susaf/sprints/${sprint_id}`);
+            console.log(response);
+            model.value.data.sprint = response.data;
+            console.log("Sprint fetched successfully:", model.value.data.sprint);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to fetch sprint: " + error.message);
+        }
     }
-}
 
-onMounted(() => {
-    model.value.data.status.sort((a, b) => a.order - b.order);
-});
+    async function get_tasks(sprint_id) {
+        try {
+            const response = await axios.get(`${backendBaseUrl}/susaf/sprints/${sprint_id}/tasks/`);
+            console.log(response);
+            model.value.data.cards = response.data.map(task => ({
+                id: task.id,
+                title: task.title,
+                status_id: convert_status_to_id(task.status),
+                impact: Array.isArray(task.impact) 
+                    ? task.impact.map(impactItem => impactItem.replace(/\b\w/g, char => char.toUpperCase())).join(', ') 
+                    : task.impact.replace(/\b\w/g, char => char.toUpperCase()),
+            }));
+
+            console.log("Tasks fetched successfully:", model.value.data.cards.length);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to fetch tasks: " + error.message);
+        }
+    }
+
+    function fetchData() {
+        const sprint_id = route.params.id;
+        if (sprint_id) {
+            get_sprint(sprint_id);
+            get_tasks(sprint_id);
+        }
+    }
+
+    watch(
+        () => route.params.sprint_id,
+        (newSprintId, oldSprintId) => {
+            if (newSprintId !== oldSprintId) {
+                fetchData();
+            }
+        }
+    );
+
+    watch(
+        () => route.params.id,
+        (newId) => {
+            if (newId) {
+                fetchData();
+            }
+        }
+    );
+
+    onMounted(() => {
+        fetchData();
+    });
+
+    function moveCard({ card_id, from_status, to_status }) {
+        const card = model.value.data.cards.find((c) => c.id == card_id);
+        if (card) {
+            card.status_id = to_status;
+        }
+    }
+
+    onMounted(() => {
+        model.value.data.status.sort((a, b) => a.order - b.order);
+    });
 </script>
 
 <template>
     <section>
         <section class="goal-header">
             <div class="header-left">
-                <div class="goal-title"> Sprint 1 </div>
+                <div class="goal-title"> {{model.data.sprint.title }} Sprint </div>
             </div>
         </section>
 

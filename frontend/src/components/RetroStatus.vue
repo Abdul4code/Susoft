@@ -51,7 +51,9 @@ function handleDrop(event) {
                 :title="card.title"
                 :status_id="props.status_id"
                 @drag_start="(card_id) => console.log(`Dragging card ${card_id}`)"
+                @update:title="(newTitle) => $emit('update_note', { ...card, title: newTitle })"
             />
+
         </div>
     </div>
 </template>
@@ -72,10 +74,12 @@ function handleDrop(event) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
 }
 
 .goal_header p{
-    flex: 1 0 50%;
+    flex: 1 0 75%;
+    font-size: 16px !important;
 }
 
 .goal_header p:nth-child(1){
@@ -115,7 +119,7 @@ function handleDrop(event) {
     background-color: rgba(240, 240, 240, 1); 
     height: 92%;
     width: 90%;
-    margin-top: 1.4%;
+    margin-top: 5%;
     border-radius: 10px;
     padding: 5%;
 }

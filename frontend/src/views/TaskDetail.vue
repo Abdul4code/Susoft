@@ -1,34 +1,25 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Navbar from '../components/navbar.vue';
 import router from '@/router';
 import { useRoute } from 'vue-router';
-import axios from 'axios'
+import axios from 'axios';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'vue-chartjs';
+
+// Register Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const route = useRoute();
-
 const taskid = route.params.id;
 
 // Define Status Options
-const STATUS_OPTIONS = ['All', 'To do', 'In progress', 'In review', 'Completed'];
+const STATUS_OPTIONS = ['all', 'To do', 'In progress', 'In review', 'Completed'];
 
 const taskDetail = ref("");
-
-// Define Task Status
 const taskStatus = ref({
     mainStatus: 'All',
-    metrics: [
-        { name: 'Has at least one sustainability practice/criteria', status: 'To do' },
-        { name: 'Ensure sustainability considerations are included in the task description', status: 'To do' },
-        { name: 'Identify sustainability objectives related to the task', status: 'To do' },
-        { name: "Assign sustainability-related labels ('energy efficient', 'low carbon')", status: 'To do' },
-        { name: 'Implement green coding practices (optimized queries, efficient algorithms)', status: 'In progress' },
-        { name: 'Ensure that cloud services are deployed in low-carbon data centers', status: 'In progress' },
-        { name: 'Validate that the feature sustainability benchmarks/criteria were achieved', status: 'In review' },
-        { name: 'Ensure the UI follows accessibility', status: 'In review' },
-        { name: 'Document sustainability impact in sprint reports', status: 'Completed' },
-        { name: 'Generate sustainability KPIs', status: 'Completed' }
-    ]
+    metrics: []
 });
 
 // Computed property to filter tasks based on main status
@@ -39,30 +30,92 @@ const filteredMetrics = computed(() => {
     return taskStatus.value.metrics.filter(task => task.status === taskStatus.value.mainStatus);
 });
 
-// Function to dynamically assign class for styling based on status
-const statusClass = (status) => {
-    return {
-        'to-do': status === 'To do',
-        'in-progress': status === 'In progress',
-        'in-review': status === 'In review',
-        'completed': status === 'Completed'
-    };
-};
+// Pie chart data
+const chartData = ref({
+    labels: ['To do', 'In progress', 'In review', 'Completed'],
+    datasets: [
+        {
+            label: 'Metrics Status',
+            data: [0, 0, 0, 0],
+            backgroundColor: ['#b0bec5', '#fdd835', '#26c6da', '#66bb6a'],
+            borderWidth: 1
+        }
+    ]
+});
 
-function getTask(taskId){
-    axios.get(`http://129.213.86.120:8000/susaf/tasks/${taskId}`)
-        .then(function (response) {
-            taskDetail.value = response.data
+// Function to map status to value
+function status_to_value(status) {
+    switch (status) {
+        case 'To do':
+            return 'to_do';
+        case 'In progress':
+            return 'in_progress';
+        case 'In review':
+            return 'in_review';
+        case 'Completed':
+            return 'completed';
+        default:
+            return '';
+    }
+}
+
+// Function to update chart data
+function updateChartData() {
+    const statusCounts = { 'to_do': 0, 'in_progress': 0, 'in_review': 0, 'completed': 0 };
+    taskStatus.value.metrics.forEach(metric => {
+        statusCounts[metric.status] = (statusCounts[metric.status] || 0) + 1;
+    });
+
+    chartData.value.datasets[0].data = [
+        statusCounts['to_do'],
+        statusCounts['in_progress'],
+        statusCounts['in_review'],
+        statusCounts['completed']
+    ];
+}
+
+// Fetch task details
+function getTask(taskId) {
+    axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/susaf/tasks/${taskId}`)
+        .then(response => {
+            taskDetail.value = response.data;
         })
-        .catch(function (error) {
-            alert(error)
+        .catch(error => {
+            alert(error);
         });
 }
 
-getTask(taskid)
+// Fetch metrics and update chart data
+async function getMetrics(taskId) {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/metrics/by-task/${taskId}/`);
+        taskStatus.value.metrics = response.data.map(metric => ({
+            name: metric.text,
+            status: metric.status,
+            id: metric.id
+        }));
+        updateChartData();
+    } catch (error) {
+        console.error('Error fetching metrics:', error);
+    }
+}
+
+// Update metric status
+async function updateMetricStatus(metric) {
+    try {
+        await axios.patch(`${import.meta.env.VITE_BACKEND_BASE_URL}/metrics/${metric.id}/`, {
+            status: metric.status
+        });
+        updateChartData();
+    } catch (error) {
+        console.error("Error updating metric status:", error);
+        alert("Failed to update the metric's status. Please try again.");
+    }
+}
+
+getTask(taskid);
+getMetrics(taskid);
 </script>
-
-
 
 <template>
     <div>
@@ -76,16 +129,23 @@ getTask(taskid)
                 <div class="left-column">
                     <div class="status-section">
                         <h3>Task Metrics</h3>
-                        <label for="main-status">Filter by Status:</label>
-                        <select v-model="taskStatus.mainStatus" id="main-status" class="status-dropdown">
-                            <option v-for="status in STATUS_OPTIONS" :key="status" :value="status">{{ status }}</option>
-                        </select>
 
                         <div class="tasks">
                             <div v-for="(task, index) in filteredMetrics" :key="index" class="task-item">
                                 <span>{{ task.name }}</span>
-                                <select v-model="task.status" class="status-dropdown" :class="statusClass(task.status)">
-                                    <option v-for="status in STATUS_OPTIONS.slice(1)" :key="status" :value="status">{{ status }}</option>
+                                <select 
+                                    v-model="task.status" 
+                                    class="status-dropdown" 
+                                    :class="task.status" 
+                                    @change="updateMetricStatus(task)"
+                                >
+                                    <option 
+                                        v-for="status in STATUS_OPTIONS.slice(1)"
+                                        :key="status" 
+                                        :value="status_to_value(status)"
+                                    >
+                                        {{ status }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -108,6 +168,12 @@ getTask(taskid)
                         <h3>Impact Type</h3>
                         <p>{{ taskDetail.type}}</p>
                     </div>
+
+                    <!-- Pie Chart Section -->
+                    <div class="chart-section">
+                        <h3> </h3>
+                        <Pie :data="chartData" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,88 +181,135 @@ getTask(taskid)
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .page-container {
-    padding: 20px;
-    font-family: 'Poppins', sans-serif;
-    max-width: 80%;
+    padding: 40px 20px;
+    font-family: 'Inter', sans-serif;
+    width: 95%;
     margin: auto;
-}
-.page-title {
-    text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    margin-top: 25px;
-    font-family: 'Poppins', sans-serif;
+    color: #333;
 }
 
-.task-title{
+.page-title {
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-    margin-top: 25px;
-    font-family: 'Poppins', sans-serif;
-    margin-bottom: 50px;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #2c3e50;
 }
+
+.task-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 40px;
+}
+
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 120px;
+    gap: 60px;
 }
 
 .left-column, .right-column {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-in-out;
 }
+
+.left-column:hover,
+.right-column:hover {
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+}
+
 .status-section h3,
 .description h3,
-.sustainability-impact h3 {
-    margin-bottom: 10px;
+.sustainability-impact h3,
+.Imapct\ Type h3 {
+    margin-bottom: 16px;
     font-weight: 600;
+    font-size: 20px;
+    color: #34495e;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 8px;
 }
+
 .status-dropdown {
-    padding: 8px 15px;
+    padding: 10px 18px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    font-weight: 500;
+    font-size: 14px;
+    appearance: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 140px;
 }
+
 .tasks {
     margin-top: 10px;
 }
+
 .task-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f5f5f5;
-    padding: 12px;
-    margin: 8px 0;
-    border-radius: 5px;
+    background: #fdfdfd;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 1px solid #eaeaea;
     font-size: 14px;
     font-weight: 500;
-}
-.status-dropdown.to-do {
-    background-color: #6c757d;
-    color: white;
-}
-.status-dropdown.in-progress {
-    background-color: #ffc107;
-    color: black;
-}
-.status-dropdown.in-review {
-    background-color: #17a2b8;
-    color: white;
-}
-.status-dropdown.completed {
-    background-color: #28a745;
-    color: white;
+    transition: box-shadow 0.3s ease;
 }
 
-h3{
-    margin-top: 40px;
+.task-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.status-dropdown.to_do {
+    background-color: #b0bec5;
+    color: #fff;
+}
+.status-dropdown.in_progress {
+    background-color: #fdd835;
+    color: #333;
+}
+.status-dropdown.in_review {
+    background-color: #26c6da;
+    color: #fff;
+}
+.status-dropdown.completed {
+    background-color: #66bb6a;
+    color: #fff;
+}
+
+.right-column p,
+.left-column p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+.chart-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    height: 400px; /* Ensure the height is consistent */
+    text-align: center;
+    flex-direction: column;
+    margin-top: 100px;
+    gap: 40px;
 }
 
 /* Responsive Design */
@@ -204,5 +317,17 @@ h3{
     .content-grid {
         grid-template-columns: 1fr;
     }
+    .page-title {
+        font-size: 28px;
+    }
+    .task-title {
+        font-size: 18px;
+    }
+}
+
+/* Add styles for the chart section */
+.chart-section {
+    margin-top: 30px;
+    text-align: center;
 }
 </style>

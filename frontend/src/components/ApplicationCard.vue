@@ -1,18 +1,43 @@
 <script setup>
+import { ref, onMounted } from "vue";
+import axios from "axios";
+
 const props = defineProps({
     title: String,
     tasks: Object,
     card_id: Number, // Unique identifier for the card
     status_id: Number, // Current status ID
+    impact: String, // Impact value for the card
 });
 
 const emits = defineEmits(["drag_start"]);
+
+const metrics = ref([]); // Store the list of metrics
+
+// Backend base URL from environment variables
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
+// Fetch metrics for the task
+async function fetchMetrics() {
+    try {
+        const response = await axios.get(`${backendBaseUrl}/metrics/by-task/${props.card_id}/`);
+        metrics.value = response.data;
+        console.log("Metrics fetched:", metrics.value);
+    } catch (error) {
+        console.error("Error fetching metrics:", error);
+    }
+}
 
 function handleDragStart(event) {
     event.dataTransfer.setData("card_id", props.card_id);
     event.dataTransfer.setData("from_status", props.status_id);
     emits("drag_start", props.card_id);
 }
+
+// Fetch metrics when the component is mounted
+onMounted(() => {
+    fetchMetrics();
+});
 </script>
 
 <template>
@@ -21,20 +46,20 @@ function handleDragStart(event) {
         draggable="true"
         @dragstart="handleDragStart"
     >
-        <p class="title"> Implement Security  </p>
+        <p class="title"> {{ props.title }} </p>
         <p>
             <span class="app_icon"><img src="../assets/images/tasks.svg" /></span>
-            <span class="app_summary"> 15 Metrics </span>
+            <span class="app_summary"> {{ metrics.length }} Metrics </span>
         </p>
         <p>
             <span class="app_icon"><img src="../assets/images/done.svg" /></span>
-            <span class="app_summary"> 9 Satisfied </span>
+            <span class="app_summary"> {{ metrics.filter(metric => metric.status === 'completed').length }} Satisfied </span>
         </p>
         <div class="status-cont">
             <div class="app-status progress"></div>
             <div class="app-status completed"></div>
         </div>
-        <p class="current"> Impact: Economic, Environmental</p>
+        <p class="current"> Impact: {{ props.impact }}</p>
     </div>
 </template>
 

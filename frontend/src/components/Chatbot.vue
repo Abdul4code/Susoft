@@ -44,7 +44,7 @@ export default {
       isTyping: false,
       darkMode: true,
       error: null,
-      isMinimized: false
+      isMinimized: true, // Set to true to keep the chatbot closed by default
     };
   },
   async mounted() {
