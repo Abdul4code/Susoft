@@ -51,7 +51,9 @@ function handleDrop(event) {
                 :title="card.title"
                 :status_id="props.status_id"
                 @drag_start="(card_id) => console.log(`Dragging card ${card_id}`)"
+                @update:title="(newTitle) => $emit('update_note', { ...card, title: newTitle })"
             />
+
         </div>
     </div>
 </template>

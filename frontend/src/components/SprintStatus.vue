@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import ApplicationCard from "./ApplicationCard.vue";
+import axios from 'axios';
 
 const props = defineProps({
     status_id: Number,
@@ -10,21 +11,50 @@ const props = defineProps({
     cards: Array, // List of cards belonging to this status
 });
 
+// Backend base URL from environment variables
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
 const emits = defineEmits(["move_card"]);
 
 function allowDrop(event) {
     event.preventDefault();
 }
 
-function handleDrop(event) {
+// Function to convert ID string to status
+function convert_id_to_status(id) {
+    const idMap = {
+        "1": "to_do",
+        "2": "in_progress",
+        "3": "under_review",
+        "4": "completed",
+    };
+    return idMap[id] || null;
+}
+
+
+
+async function handleDrop(event) {
     event.preventDefault();
     const card_id = event.dataTransfer.getData("card_id");
     const from_status = event.dataTransfer.getData("from_status");
     
     if (card_id && from_status !== props.status_id) {
         emits("move_card", { card_id, from_status, to_status: props.status_id });
+
+        // Update the card's status in the database
+        try {
+            console.log(convert_id_to_status(props.status_id))
+            await axios.patch(`${backendBaseUrl}/susaf/tasks/${card_id}/`, {
+                status: convert_id_to_status(props.status_id),
+            });
+            console.log(`Card ${card_id} updated to status ${props.status_id}`);
+        } catch (error) {
+            console.error("Error updating card status:", error);
+            alert("Failed to update the card's status. Please try again.");
+        }
     }
 }
+
 </script>
 
 <template>
@@ -50,7 +80,9 @@ function handleDrop(event) {
                 :card_id="card.id"
                 :title="card.title"
                 :status_id="props.status_id"
+                :impact="card.impact"
                 @drag_start="(card_id) => console.log(`Dragging card ${card_id}`)"
+                @click="() => $router.push(`/detail/${card.id}`)"
             />
         </div>
     </div>

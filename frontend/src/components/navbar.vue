@@ -66,8 +66,6 @@ onMounted(() => {
 
     get_project();
 
-    console.log("Project ID from state:", projectState.state.project_id);
-
     if (projectState.state.project_id) {
         get_sprints(projectState.state.project_id);
     }
@@ -80,7 +78,6 @@ function handleProjectClick(projectId) {
 
 
     router.push({ name: 'backlog', params: { id: projectId} });
-    console.log(`Project clicked: ${projectState.state.project_id}`);
 }
 
 
@@ -98,7 +95,6 @@ async function get_sprints(project_id) {
         for (const sprint of response.data) {
             if (sprint.project == project_id) {
                 sprints.value.push(sprint);
-                console.log(sprints.value)
             }
             
         }

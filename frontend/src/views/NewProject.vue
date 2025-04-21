@@ -16,6 +16,19 @@ const model = ref({
     }
 });
 
+const metrics = ref([
+        { name: 'Has at least one sustainability practice/criteria', status: 'to_do' },
+        { name: 'Ensure sustainability considerations are included in the task description', status: 'to_do' },
+        { name: 'Identify sustainability objectives related to the task', status: 'to_do' },
+        { name: "Assign sustainability-related labels ('energy efficient', 'low carbon')", status: 'to_do' },
+        { name: 'Implement green coding practices (optimized queries, efficient algorithms)', status: 'to_do' },
+        { name: 'Ensure that cloud services are deployed in low-carbon data centers', status: 'to_do' },
+        { name: 'Validate that the feature sustainability benchmarks/criteria were achieved', status: 'to_do' },
+        { name: 'Ensure the UI follows accessibility', status: 'to_do' },
+        { name: 'Document sustainability impact in sprint reports', status: 'to_do' },
+        { name: 'Generate sustainability KPIs', status: 'to_do' }
+]);
+
 const project_data = ref({
     name: '',
     token: '',
@@ -194,7 +207,7 @@ async function send_task(task) {
             impact: task.impact,
         });
 
-        for (const metric of task.metrics) {
+        for (const metric of metrics.value) {
             await send_metric(metric, response.data.id);
         }
     } catch (error) {
@@ -208,12 +221,15 @@ async function send_metric(metric, task_id) {
         axios.defaults.baseURL = backendBaseUrl;
 
         await axios.post(`${backendBaseUrl}/susaf/metrics/`, {
-            text: metric.text,
+            text: metric.name,
             status: metric.status,
             task: task_id
         });
+
     } catch (error) {
+        alert(error.message);
         showNotification(error.response?.data?.message || "Error sending metric", "error");
+        console.log(error);
     }
 }
 

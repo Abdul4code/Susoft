@@ -10,7 +10,7 @@ const route = useRoute();
 const taskid = route.params.id;
 
 // Define Status Options
-const STATUS_OPTIONS = ['All', 'To do', 'In progress', 'In review', 'Completed'];
+const STATUS_OPTIONS = ['all', 'To do', 'In progress', 'In review', 'Completed'];
 
 const taskDetail = ref("");
 
@@ -18,16 +18,6 @@ const taskDetail = ref("");
 const taskStatus = ref({
     mainStatus: 'All',
     metrics: [
-        { name: 'Has at least one sustainability practice/criteria', status: 'To do' },
-        { name: 'Ensure sustainability considerations are included in the task description', status: 'To do' },
-        { name: 'Identify sustainability objectives related to the task', status: 'To do' },
-        { name: "Assign sustainability-related labels ('energy efficient', 'low carbon')", status: 'To do' },
-        { name: 'Implement green coding practices (optimized queries, efficient algorithms)', status: 'In progress' },
-        { name: 'Ensure that cloud services are deployed in low-carbon data centers', status: 'In progress' },
-        { name: 'Validate that the feature sustainability benchmarks/criteria were achieved', status: 'In review' },
-        { name: 'Ensure the UI follows accessibility', status: 'In review' },
-        { name: 'Document sustainability impact in sprint reports', status: 'Completed' },
-        { name: 'Generate sustainability KPIs', status: 'Completed' }
     ]
 });
 
@@ -42,12 +32,27 @@ const filteredMetrics = computed(() => {
 // Function to dynamically assign class for styling based on status
 const statusClass = (status) => {
     return {
-        'to-do': status === 'To do',
-        'in-progress': status === 'In progress',
-        'in-review': status === 'In review',
+        'to_do': status === 'To do',
+        'in_progress': status === 'In progress',
+        'in_review': status === 'In review',
         'completed': status === 'Completed'
     };
 };
+
+function status_to_value(status) {
+    switch (status) {
+        case 'To do':
+            return 'to_do';
+        case 'In progress':
+            return 'in_progress';
+        case 'In review':
+            return 'in_review';
+        case 'Completed':
+            return 'completed';
+        default:
+            return status;
+    }
+}
 
 // Use the base backend URL from environment variables
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
@@ -62,7 +67,38 @@ function getTask(taskId) {
         });
 }
 
+async function getMetrics(taskId) {
+    try {
+        const response = await axios.get(`${backendBaseUrl}/metrics/by-task/${taskId}/`);
+        console.log('Metrics fetched:', response.data);
+        // Update taskStatus metrics with the fetched data
+        taskStatus.value.metrics = response.data.map(metric => ({
+            name: metric.text,
+            status: metric.status,
+            id: metric.id,
+        }));
+    } catch (error) {
+        console.error('Error fetching metrics:', error);
+    }
+}
+
+
+async function updateMetricStatus(metric) {
+    console.log(metric);
+    try {
+        const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+        await axios.patch(`${backendBaseUrl}/metrics/${metric.id}/`, {
+            status: metric.status,
+        });
+        console.log(`Metric ${metric.id} updated to status ${metric.status}`);
+    } catch (error) {
+        console.error("Error updating metric status:", error);
+        alert("Failed to update the metric's status. Please try again.");
+    }
+}
+
 getTask(taskid);
+getMetrics(taskid)
 </script>
 
 
@@ -79,16 +115,23 @@ getTask(taskid);
                 <div class="left-column">
                     <div class="status-section">
                         <h3>Task Metrics</h3>
-                        <label for="main-status">Filter by Status:</label>
-                        <select v-model="taskStatus.mainStatus" id="main-status" class="status-dropdown">
-                            <option v-for="status in STATUS_OPTIONS" :key="status" :value="status">{{ status }}</option>
-                        </select>
 
                         <div class="tasks">
                             <div v-for="(task, index) in filteredMetrics" :key="index" class="task-item">
                                 <span>{{ task.name }}</span>
-                                <select v-model="task.status" class="status-dropdown" :class="statusClass(task.status)">
-                                    <option v-for="status in STATUS_OPTIONS.slice(1)" :key="status" :value="status">{{ status }}</option>
+                                <select 
+                                    v-model="task.status" 
+                                    class="status-dropdown" 
+                                    :class="task.status" 
+                                    @change="updateMetricStatus(task)"
+                                >
+                                    <option 
+                                        v-for="status in STATUS_OPTIONS.slice(1)"
+                                        :key="status" 
+                                        :value="status_to_value(status)"
+                                    >
+                                        {{ status }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -181,15 +224,15 @@ getTask(taskid);
     font-size: 14px;
     font-weight: 500;
 }
-.status-dropdown.to-do {
+.status-dropdown.to_do {
     background-color: #6c757d;
     color: white;
 }
-.status-dropdown.in-progress {
+.status-dropdown.in_progress {
     background-color: #ffc107;
     color: black;
 }
-.status-dropdown.in-review {
+.status-dropdown.in_review {
     background-color: #17a2b8;
     color: white;
 }
