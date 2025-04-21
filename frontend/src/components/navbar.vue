@@ -165,9 +165,6 @@ async function get_sprints(project_id) {
                                 <router-link :to="`/sprint/${sprint.id}`" class="nav-link">{{ sprint.title }}</router-link>
                             </p>
                         </template>
-                        <template v-else>
-                            <p class="no-sprints nav-link">No project is selected</p>
-                        </template>
                         
                     </div>
                 </li>
