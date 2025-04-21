@@ -113,7 +113,8 @@ onMounted(() => {
 <template>
     <section>
         <section class="goal-header">
-            <div class="header-left">
+            <div class="header-left"> 
+                <div class="goal-title"> Retrospective </div>
                 <select v-model="selectedSprint" @change="fetchSprintData" class="sprint-dropdown">
                     <option v-for="sprint in sprints" :key="sprint.id" :value="sprint.id">
                         {{ sprint.title }}
@@ -140,6 +141,7 @@ onMounted(() => {
         <!-- Add New Card Button -->
         <button class="add-card-btn" @click="addNewCard">
             <span class="add-card-icon">+</span>
+            <span class="tooltip">Add a new card</span>
         </button>
     </section>
 </template>
@@ -164,9 +166,10 @@ onMounted(() => {
 
     .app-container {
         display: flex;
-        gap: 25px;
+        gap: 40px;
         overflow-x: auto;
         padding: 20px;
+        height: 83vh;
     }
 
     .goal-header {
@@ -204,6 +207,28 @@ onMounted(() => {
 
     .add-card-btn:active {
         transform: scale(0.95);
+    }
+
+    .add-card-btn .tooltip {
+        position: absolute;
+        bottom: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .add-card-btn:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
     }
 
     .add-card-icon {

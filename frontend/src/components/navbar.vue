@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useStateStore } from "../stores/state.js";
 import { useRouter } from 'vue-router';
@@ -38,7 +38,7 @@ function toggle_subnav(nav) {
         model.value.styles.sprint_nav_open = !model.value.styles.sprint_nav_open;
         model.value.styles.project_nav_open = false;
         model.value.styles.contributors_nav_open = false;
-        handleSprintdropdownClick()
+        handleSprintdropdownClick();
     } else if (nav == "Goals") {    
         model.value.styles.project_nav_open = !model.value.styles.project_nav_open;
         model.value.styles.contributors_nav_open = false;
@@ -50,60 +50,70 @@ function toggle_subnav(nav) {
     }
 }
 
-async function get_project() {
-  try {
-    const response = await axios.get(`${backendBaseUrl}/susaf/projects/`);
-    projects.value = response.data;
-  } catch (error) {
-    console.error(error);
-    alert(error);
-  }
+function closeAllDropdowns() {
+    model.value.styles.project_nav_open = false;
+    model.value.styles.sprint_nav_open = false;
+    model.value.styles.contributors_nav_open = false;
+}
+
+function handleDocumentClick(event) {
+    const dropdowns = document.querySelectorAll('.nav-header, .goals-dropdown, .applications-dropdown');
+    const isClickInside = Array.from(dropdowns).some(dropdown => dropdown.contains(event.target));
+    if (!isClickInside) {
+        closeAllDropdowns();
+    }
 }
 
 onMounted(() => {
     projects.value = "";
     sprints.value = [];
-
     get_project();
 
     if (projectState.state.project_id) {
         get_sprints(projectState.state.project_id);
     }
 
+    document.addEventListener('click', handleDocumentClick);
 });
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleDocumentClick);
+});
+
+async function get_project() {
+    try {
+        const response = await axios.get(`${backendBaseUrl}/susaf/projects/`);
+        projects.value = response.data;
+    } catch (error) {
+        console.error(error);
+        alert(error);
+    }
+}
 
 function handleProjectClick(projectId) {
     projectState.saveProjectId(projectId); // Set the project ID in the state store
-    get_sprints(projectId)
-
-
-    router.push({ name: 'backlog', params: { id: projectId} });
+    get_sprints(projectId);
+    router.push({ name: 'backlog', params: { id: projectId } });
 }
-
 
 function handleSprintdropdownClick() {
     let new_id = projectState.state.project_id;
-    get_sprints(new_id)
-    
+    get_sprints(new_id);
 }
 
 async function get_sprints(project_id) {
     sprints.value = [];
-
     try {
         const response = await axios.get(`${backendBaseUrl}/susaf/sprints/`);
         for (const sprint of response.data) {
             if (sprint.project == project_id) {
                 sprints.value.push(sprint);
             }
-            
         }
-
     } catch (error) {
         console.error(error);
     }
 }
-
 </script>
 
 <template>
@@ -168,24 +178,11 @@ async function get_sprints(project_id) {
                 <div class="left-right-nav">
                     <li class="search-field"><input type="text" placeholder="Search by any keyword" /></li>
                     <li class="create_new">
-                        <button><router-link to="/new_project">Add New</router-link></button>
+                        <button>
+                            <img src="../assets/images/add.svg" alt="Add Icon" class="add-icon" />
+                            <router-link to="/new_project">   Project</router-link>
+                        </button>
                     </li>
-                </div>
-                <div class="right-right-nav">
-                    
-                    <div>
-                        <li class="user">
-                            <img src="../assets/images/user.svg" />
-                            <span class="down-icon">
-                                <img src="../assets/images/down.svg" />
-                            </span>
-                        </li>
-                        <div class="user-dropitem">
-                            <li class="username">Mpape</li>
-                            <li class="logout">Log out</li>
-                            <li class="email">nightingale9ja@gmail.com</li>
-                        </div>
-                    </div>
                 </div>
             </ul>
         </nav>
@@ -197,5 +194,13 @@ async function get_sprints(project_id) {
 
 .no-sprints {
     color: red;
+}
+
+.add-icon {
+    width: 14px; /* Adjust size as needed */
+    height: 14px;
+    margin-right: 5px; /* Space between icon and text */
+    vertical-align: middle;
+    color: white;
 }
 </style>

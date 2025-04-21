@@ -74,10 +74,12 @@ function handleDrop(event) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
 }
 
 .goal_header p{
-    flex: 1 0 50%;
+    flex: 1 0 75%;
+    font-size: 16px !important;
 }
 
 .goal_header p:nth-child(1){
@@ -117,7 +119,7 @@ function handleDrop(event) {
     background-color: rgba(240, 240, 240, 1); 
     height: 92%;
     width: 90%;
-    margin-top: 1.4%;
+    margin-top: 5%;
     border-radius: 10px;
     padding: 5%;
 }

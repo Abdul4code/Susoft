@@ -25,12 +25,13 @@ function updateTitle(event) {
         draggable="true"
         @dragstart="handleDragStart"
     >
-        <input 
+        <textarea 
             class="title" 
             type="text" 
             :value="props.title" 
             @input="updateTitle"
-        />
+            rows="5"
+        ></textarea>
     </div>
 </template>
 
@@ -47,9 +48,10 @@ function updateTitle(event) {
 
     .title{
         font-family: 'Poppins';
-        font-size: 14pt;
+        font-size: 11pt;
         font-weight: 400;
-        width: 70%;
+        width: 100%;
+        height: 50px;
         margin-bottom: 25px;
         border: none;
         background: none;

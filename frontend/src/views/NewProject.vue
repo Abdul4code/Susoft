@@ -246,7 +246,7 @@ function showNotification(message, type) {
         <Susaf></Susaf>
 
         <!-- Button to open modal -->
-        <button class="back-button" @click="openModal"> Generate Backlogs </button>
+        <button class="generate-button" @click="openModal"> Generate Backlogs </button>
 
         <!-- Modal -->
         <div v-if="showModal" class="modal-overlay">
@@ -302,46 +302,80 @@ function showNotification(message, type) {
 
 .modal {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 40px; /* Increased padding for more spacing */
+    border-radius: 20px; /* Slightly more rounded corners */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     text-align: center;
-    width: 300px;
+    width: 500px; /* Slightly wider modal */
+    max-width: 90%; /* Responsive design */
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .modal h2 {
-    margin-bottom: 15px;
-    font-size: 18px;
+    margin-bottom: 50px; /* Add more space below the heading */
+    font-size: 18px; /* Keep font size consistent */
+    font-weight: 500px;
+    color: #333;
 }
 
 .modal-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
+    width: 95%;
+    padding: 15px; /* Add more padding inside the input */
+    margin-bottom: 50px; /* Add more space below the input */
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px; /* Slightly more rounded input */
+    font-size: 14px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .modal-actions {
     display: flex;
     justify-content: space-between;
+    gap: 15px; /* Add more spacing between buttons */
 }
 
 .modal-btn {
-    padding: 8px 15px;
+    padding: 15px 25px; /* Add more padding to buttons */
     border: none;
-    border-radius: 5px;
+    border-radius: 10px; /* Slightly more rounded buttons */
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    transition: all 0.3s ease;
 }
 
 .modal-btn.confirm {
-    background: #4CAF50;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
     color: white;
 }
 
+.modal-btn.confirm:hover {
+    background: linear-gradient(135deg, #66BB6A, #388E3C);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
 .modal-btn.cancel {
-    background: #f44336;
+    background: linear-gradient(135deg, #f44336, #d32f2f);
     color: white;
+}
+
+.modal-btn.cancel:hover {
+    background: linear-gradient(135deg, #e57373, #c62828);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Fade-in animation for modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* Progress Bar Styles */
@@ -358,5 +392,33 @@ function showNotification(message, type) {
     height: 100%;
     background: #4CAF50;
     transition: width 0.3s ease;
+}
+
+/* Generate Button Styles */
+.generate-button {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.generate-button:hover {
+    background: linear-gradient(135deg, #66BB6A, #388E3C);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.generate-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

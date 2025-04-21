@@ -112,7 +112,7 @@
     <section>
         <section class="goal-header">
             <div class="header-left">
-                <div class="goal-title"> {{model.data.sprint.title}} </div>
+                <div class="goal-title"> {{model.data.sprint.title }} Sprint </div>
             </div>
         </section>
 
